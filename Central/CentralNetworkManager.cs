@@ -65,7 +65,9 @@ namespace MultiplayerARPG.MMO
         {
             Initialize();
         }
-#else
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         protected override void Start()
         {
             Initialize();
@@ -138,7 +140,11 @@ namespace MultiplayerARPG.MMO
             if (!IsServer)
                 return;
             ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Disconnect, (writer) => writer.PutBytesWithLength(data));
+#if NET || NETCOREAPP
             await Task.Delay(500);
+#else
+            await UniTask.Delay(500);
+#endif
             ServerTransport.ServerDisconnect(connectionId);
         }
 

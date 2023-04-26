@@ -70,9 +70,8 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
                 if (Application.isEditor && isOverrideExePath)
                     return overrideExePath;
-#else
-                return exePath;
 #endif
+                return exePath;
             }
         }
 
@@ -83,9 +82,8 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
                 if (Application.isEditor)
                     return editorNotSpawnInBatchMode;
-#else
-                return notSpawnInBatchMode;
 #endif
+                return notSpawnInBatchMode;
             }
         }
 
@@ -104,7 +102,9 @@ namespace MultiplayerARPG.MMO
         {
             Initialize();
         }
-#else
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         protected override void Start()
         {
             Initialize();
@@ -277,12 +277,16 @@ namespace MultiplayerARPG.MMO
             {
                 SpawnMap(mapId, true);
                 // Add some delay before spawn next map
+#if NET || NETCOREAPP
                 await Task.Delay(100);
+#else
+                await UniTask.Delay(100);
+#endif
             }
         }
 #endif
 
-        private void FreePort(int port)
+                private void FreePort(int port)
         {
             _freePorts.Enqueue(port);
         }
