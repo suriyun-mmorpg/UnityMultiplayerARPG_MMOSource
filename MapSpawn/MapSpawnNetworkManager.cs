@@ -31,6 +31,7 @@ namespace MultiplayerARPG.MMO
         public string exePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
+        public string batchModeArguments = "-batchmode -nographics";
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps;
 #else
@@ -335,23 +336,23 @@ namespace MultiplayerARPG.MMO
             {
                 CreateNoWindow = false,
                 UseShellExecute = false,
-                Arguments = (!NotSpawnInBatchMode ? "-batchmode -nographics " : string.Empty) +
-                    $"{MMOServerInstance.ARG_MAP_ID} {mapId} " +
+                Arguments = (!NotSpawnInBatchMode ? batchModeArguments : string.Empty) +
+                    $"  {ProcessArguments.ARG_MAP_ID} {mapId}" +
                     (request.HasValue ?
-                        $"{MMOServerInstance.ARG_INSTANCE_ID} {request.Value.instanceId} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_X} {request.Value.instanceWarpPosition.x} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Y} {request.Value.instanceWarpPosition.y} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Z} {request.Value.instanceWarpPosition.z} " +
-                        $"{(request.Value.instanceWarpOverrideRotation ? MMOServerInstance.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_X} {request.Value.instanceWarpRotation.x} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Y} {request.Value.instanceWarpRotation.y} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Z} {request.Value.instanceWarpRotation.z} "
+                        $" {ProcessArguments.ARG_INSTANCE_ID} {request.Value.instanceId}" +
+                        $" {ProcessArguments.ARG_INSTANCE_POSITION_X} {request.Value.instanceWarpPosition.x}" +
+                        $" {ProcessArguments.ARG_INSTANCE_POSITION_Y} {request.Value.instanceWarpPosition.y}" +
+                        $" {ProcessArguments.ARG_INSTANCE_POSITION_Z} {request.Value.instanceWarpPosition.z}" +
+                        $" {(request.Value.instanceWarpOverrideRotation ? ProcessArguments.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_X} {request.Value.instanceWarpRotation.x}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_Y} {request.Value.instanceWarpRotation.y}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_Z} {request.Value.instanceWarpRotation.z}"
                         : string.Empty) +
-                    $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {clusterServerAddress} " +
-                    $"{MMOServerInstance.ARG_CENTRAL_PORT} {clusterServerPort} " +
-                    $"{MMOServerInstance.ARG_MACHINE_ADDRESS} {machineAddress} " +
-                    $"{MMOServerInstance.ARG_MAP_PORT} {port} " +
-                    $"{MMOServerInstance.ARG_START_MAP_SERVER} ",
+                    $" {ProcessArguments.ARG_CENTRAL_ADDRESS} {clusterServerAddress}" +
+                    $" {ProcessArguments.ARG_CENTRAL_PORT} {clusterServerPort}" +
+                    $" {ProcessArguments.ARG_MACHINE_ADDRESS} {machineAddress}" +
+                    $" {ProcessArguments.ARG_MAP_PORT} {port}" +
+                    $" {ProcessArguments.ARG_START_MAP_SERVER}",
             };
 
             if (LogInfo)
