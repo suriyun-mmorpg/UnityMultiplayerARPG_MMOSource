@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using LiteNetLibManager;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +7,9 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
 using ConcurrentCollections;
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+using UnityEngine;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
@@ -29,7 +31,11 @@ namespace MultiplayerARPG.MMO
         public string exePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps;
+#else
+        public List<string> spawningMapIds;
+#endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Running In Editor")]
@@ -61,10 +67,12 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
                 if (Application.isEditor && isOverrideExePath)
                     return overrideExePath;
-                else
-                    return exePath;
+#else
+                return exePath;
+#endif
             }
         }
 
@@ -72,10 +80,12 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
                 if (Application.isEditor)
                     return editorNotSpawnInBatchMode;
-                else
-                    return notSpawnInBatchMode;
+#else
+                return notSpawnInBatchMode;
+#endif
             }
         }
 
@@ -239,28 +249,35 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void OnResponseAppServerRegister(AckResponseCode responseCode)
         {
             if (responseCode != AckResponseCode.Success)
                 return;
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            List<string> spawningMapIds = new List<string>();
             if (spawningMaps == null || spawningMaps.Count == 0)
             {
                 spawningMaps = new List<BaseMapInfo>();
                 spawningMaps.AddRange(GameInstance.MapInfos.Values);
             }
-            SpawnMaps(spawningMaps).Forget();
-        }
+            foreach (BaseMapInfo spawningMap in spawningMaps)
+            {
+                spawningMapIds.Add(spawningMap.Id);
+            }
 #endif
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            SpawnMaps(spawningMapIds).Forget();
+#endif
+        }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        private async UniTaskVoid SpawnMaps(List<BaseMapInfo> spawningMaps)
+        private async UniTaskVoid SpawnMaps(List<string> spawningMapIds)
         {
-            foreach (BaseMapInfo map in spawningMaps)
+            foreach (string mapId in spawningMapIds)
             {
-                SpawnMap(map.Id, true);
+                SpawnMap(mapId, true);
                 // Add some delay before spawn next map
-                await UniTask.Delay(100, true);
+                await Task.Delay(100);
             }
         }
 #endif

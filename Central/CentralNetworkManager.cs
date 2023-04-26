@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
 using System.Net.Sockets;
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+using UnityEngine;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
@@ -49,7 +51,7 @@ namespace MultiplayerARPG.MMO
         public System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
         public System.Action onClientStopped;
 
-        private float _lastUserCountUpdateTime = float.MinValue;
+        private long _lastUserCountUpdateTime = 0;
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public ClusterServer ClusterServer { get; private set; }
@@ -90,9 +92,10 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 ClusterServer.Update();
-                if (Time.unscaledTime - _lastUserCountUpdateTime > updateUserCountInterval)
+                long currentTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                if (currentTime - _lastUserCountUpdateTime > updateUserCountInterval * 1000)
                 {
-                    _lastUserCountUpdateTime = Time.unscaledTime;
+                    _lastUserCountUpdateTime = currentTime;
                     UpdateCountUsers().Forget();
                 }
             }
@@ -123,7 +126,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<RequestSelectCharacterMessage, ResponseSelectCharacterMessage>(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
             RegisterRequestToServer<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             // Client messages
-            RegisterClientMessage(GameMsgTypes.Disconnect, HandleServerDisconnect);
+            RegisterClientMessage(MMOMessageTypes.Disconnect, HandleServerDisconnect);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
@@ -134,8 +137,8 @@ namespace MultiplayerARPG.MMO
         {
             if (!IsServer)
                 return;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameMsgTypes.Disconnect, (writer) => writer.PutBytesWithLength(data));
-            await UniTask.Delay(500);
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Disconnect, (writer) => writer.PutBytesWithLength(data));
+            await Task.Delay(500);
             ServerTransport.ServerDisconnect(connectionId);
         }
 

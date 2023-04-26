@@ -13,5 +13,6 @@
         public const ushort UpdateGuild = 9;
         public const ushort KickUser = 10;
         public const ushort PlayerCharacterRemoved = 11;
+        public const ushort Disconnect = 18;
     }
 }

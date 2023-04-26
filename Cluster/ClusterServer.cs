@@ -145,12 +145,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        private async UniTaskVoid HandleRequestAppServerRegister(
+        private UniTaskVoid HandleRequestAppServerRegister(
             RequestHandlerData requestHandler,
             RequestAppServerRegisterMessage request,
             RequestProceedResultDelegate<ResponseAppServerRegisterMessage> result)
         {
-            await UniTask.Yield();
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             if (request.ValidateHash())
@@ -209,6 +208,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                 });
+            return default;
         }
 #endif
 
@@ -240,12 +240,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        private async UniTaskVoid HandleRequestAppServerAddress(
+        private UniTaskVoid HandleRequestAppServerAddress(
             RequestHandlerData requestHandler,
             RequestAppServerAddressMessage request,
             RequestProceedResultDelegate<ResponseAppServerAddressMessage> result)
         {
-            await UniTask.Yield();
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
@@ -289,6 +288,7 @@ namespace MultiplayerARPG.MMO
                     message = message,
                     peerInfo = peerInfo,
                 });
+            return default;
         }
 #endif
 
@@ -529,11 +529,12 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            string requestId = GenericUtils.GetUniqueId();
+            string requestId = _centralNetworkManager.DataManager.GenerateMapSpawnRequestId();
             request.requestId = requestId;
             List<long> connectionIds = new List<long>(_mapSpawnServerPeers.Keys);
             // Random map-spawn server to spawn map, will use returning ackId as reference to map-server's transport handler and ackId
-            RequestSpawnMap(connectionIds[Random.Range(0, connectionIds.Count)], request);
+            System.Random random = new System.Random(System.DateTime.Now.Millisecond);
+            RequestSpawnMap(connectionIds[random.Next(0, connectionIds.Count)], request);
             // Add ack Id / transport handler to dictionary which will be used in OnRequestSpawnMap() function 
             // To send map spawn response to map-server
             _requestSpawnMapHandlers.Add(requestId, result);
@@ -570,20 +571,6 @@ namespace MultiplayerARPG.MMO
             });
 #endif
             return default;
-        }
-
-        public async UniTask<int> CountUsers()
-        {
-            await UniTask.Yield();
-            return _mapUsersByCharacterId.Count;
-        }
-
-        public async UniTask<CentralServerPeerInfo?> GetMapServer(string mapName)
-        {
-            await UniTask.Yield();
-            if (!_mapServerPeersByMapId.TryGetValue(mapName, out CentralServerPeerInfo mapServerPeerInfo))
-                return null;
-            return mapServerPeerInfo;
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)
