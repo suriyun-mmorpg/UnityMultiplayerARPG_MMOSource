@@ -115,18 +115,26 @@ namespace MultiplayerARPG.MMO
             Logging.Log(LogTag, "Disconnected from Central Server");
             IsAppRegistered = false;
             Logging.Log(LogTag, "Reconnect to central in 5 seconds...");
-            await UniTask.Delay(1000, true);
+            await DelayOneSec();
             Logging.Log(LogTag, "Reconnect to central in 4 seconds...");
-            await UniTask.Delay(1000, true);
+            await DelayOneSec();
             Logging.Log(LogTag, "Reconnect to central in 3 seconds...");
-            await UniTask.Delay(1000, true);
+            await DelayOneSec();
             Logging.Log(LogTag, "Reconnect to central in 2 seconds...");
-            await UniTask.Delay(1000, true);
+            await DelayOneSec();
             Logging.Log(LogTag, "Reconnect to central in 1 seconds...");
-            await UniTask.Delay(1000, true);
             ConnectToClusterServer();
         }
 #endif
+
+        private async UniTask DelayOneSec()
+        {
+#if NET || NETCOREAPP
+            await Task.Delay(1000);
+#else
+            await UniTask.Delay(1000, true);
+#endif
+        }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public bool RequestAppServerRegister(CentralServerPeerInfo peerInfo)
