@@ -195,7 +195,7 @@ namespace MultiplayerARPG.MMO
             }
             if (requireEmail)
             {
-                if (string.IsNullOrEmpty(email) || !Email.IsValid(email))
+                if (string.IsNullOrEmpty(email) || !email.IsValidEmail())
                 {
                     result.InvokeError(new ResponseUserRegisterMessage()
                     {

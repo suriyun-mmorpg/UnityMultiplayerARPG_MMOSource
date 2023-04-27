@@ -1,14 +1,20 @@
-﻿namespace MultiplayerARPG.MMO
+﻿using System.Net.Mail;
+
+namespace MultiplayerARPG.MMO
 {
     public static partial class Email
     {
-        public static bool IsValid(string email)
+        public static bool IsValidEmail(this string email)
         {
-            if (email.Trim().EndsWith("."))
+            if (string.IsNullOrWhiteSpace(email) ||
+                email.Trim().EndsWith("."))
+            {
                 return false;
+            }
+
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
+                MailAddress addr = new MailAddress(email);
                 return addr.Address == email;
             }
             catch
