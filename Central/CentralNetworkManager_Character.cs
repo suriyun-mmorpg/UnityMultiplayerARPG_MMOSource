@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int entityId = request.entityId;
             int factionId = request.factionId;
-            if (!NameValidating.ValidateCharacterName(characterName))
+            if (!NameExtensions.IsValidCharacterName(characterName))
             {
                 result.InvokeError(new ResponseCreateCharacterMessage()
                 {

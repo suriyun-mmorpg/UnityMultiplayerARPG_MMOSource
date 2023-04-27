@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
             string username = request.username.Trim();
             string password = request.password.Trim();
             string email = request.email.Trim();
-            if (!NameValidating.ValidateUsername(username))
+            if (!NameExtensions.IsValidUsername(username))
             {
                 result.InvokeError(new ResponseUserRegisterMessage()
                 {

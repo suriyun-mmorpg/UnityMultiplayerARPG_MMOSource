@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public static partial class Email
+    public static partial class EmailExtensions
     {
         public static bool IsValidEmail(this string email)
         {
