@@ -59,7 +59,6 @@ namespace MultiplayerARPG.MMO
         public ICentralServerDataManager DataManager { get; set; }
 #endif
 
-
 #if NET || NETCOREAPP
         public CentralNetworkManager() : base()
         {
