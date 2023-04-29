@@ -3,7 +3,9 @@ using LiteNetLibManager;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+#if !NET && !NETCOREAPP
 using UnityRestClient;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
