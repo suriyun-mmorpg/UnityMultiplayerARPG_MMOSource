@@ -57,11 +57,24 @@ namespace MultiplayerARPG.MMO
         public const string ARG_INSTANCE_ROTATION_Y = "-" + CONFIG_INSTANCE_ROTATION_Y;
         public const string CONFIG_INSTANCE_ROTATION_Z = "instanceRotationZ";
         public const string ARG_INSTANCE_ROTATION_Z = "-" + CONFIG_INSTANCE_ROTATION_Z;
+        // Database manager server
+        public const string CONFIG_USE_CUSTOM_DATABASE_CLIENT = "useCustomDatabaseClient";
+        public const string ARG_USE_CUSTOM_DATABASE_CLIENT = "-" + CONFIG_USE_CUSTOM_DATABASE_CLIENT;
+        public const string CONFIG_DATABASE_OPTION_INDEX = "databaseOptionIndex";
+        public const string ARG_DATABASE_OPTION_INDEX = "-" + CONFIG_DATABASE_OPTION_INDEX;
+        public const string CONFIG_DATABASE_DISABLE_CACHE_READING = "databaseDisableCacheReading";
+        public const string ARG_DATABASE_DISABLE_CACHE_READING = "-" + CONFIG_DATABASE_DISABLE_CACHE_READING;
+        public const string CONFIG_DATABASE_ADDRESS = "databaseManagerAddress";
+        public const string ARG_DATABASE_ADDRESS = "-" + CONFIG_DATABASE_ADDRESS;
+        public const string CONFIG_DATABASE_PORT = "databaseManagerPort";
+        public const string ARG_DATABASE_PORT = "-" + CONFIG_DATABASE_PORT;
         // Start servers
         public const string CONFIG_START_CENTRAL_SERVER = "startCentralServer";
         public const string ARG_START_CENTRAL_SERVER = "-" + CONFIG_START_CENTRAL_SERVER;
         public const string CONFIG_START_MAP_SPAWN_SERVER = "startMapSpawnServer";
         public const string ARG_START_MAP_SPAWN_SERVER = "-" + CONFIG_START_MAP_SPAWN_SERVER;
+        public const string CONFIG_START_DATABASE_SERVER = "startDatabaseServer";
+        public const string ARG_START_DATABASE_SERVER = "-" + CONFIG_START_DATABASE_SERVER;
         public const string CONFIG_START_MAP_SERVER = "startMapServer";
         public const string ARG_START_MAP_SERVER = "-" + CONFIG_START_MAP_SERVER;
     }
