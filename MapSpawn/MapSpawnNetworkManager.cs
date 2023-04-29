@@ -34,7 +34,8 @@ namespace MultiplayerARPG.MMO
         public string batchModeArguments = "-batchmode -nographics";
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps;
-#else
+#endif
+#if NET || NETCOREAPP
         public List<string> spawningMapIds;
 #endif
 
