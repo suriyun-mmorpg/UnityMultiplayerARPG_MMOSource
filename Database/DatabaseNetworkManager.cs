@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStartServer()
         {
             base.OnStartServer();
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             Database.Initialize();
 #endif
         }
