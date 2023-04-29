@@ -30,6 +30,10 @@ namespace MultiplayerARPG.MMO
             {
                 return database == null ? databaseOptions.FirstOrDefault() : database;
             }
+            set
+            {
+                database = value;
+            }
         }
 
         public bool DisableCacheReading
