@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using LiteNetLibManager;
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using UnityEngine;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
@@ -36,6 +38,11 @@ namespace MultiplayerARPG.MMO
             set { disableCacheReading = value; }
         }
 
+        public IDatabaseCache DatabaseCache
+        {
+            get; set;
+        }
+
         public void SetDatabaseByOptionIndex(int index)
         {
             if (databaseOptions != null &&
@@ -46,7 +53,7 @@ namespace MultiplayerARPG.MMO
         }
 
 #if NET || NETCOREAPP
-        public CentralNetworkManager() : base()
+        public DatabaseNetworkManager() : base()
         {
             Initialize();
         }
