@@ -3,7 +3,7 @@ using LiteNetLibManager;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-#if !NET && !NETCOREAPP
+#if UNITY_2017_1_OR_NEWER
 using UnityRestClient;
 #endif
 
