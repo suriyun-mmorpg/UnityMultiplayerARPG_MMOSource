@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using LiteNetLib.Utils;
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -19,6 +20,9 @@ namespace MultiplayerARPG.MMO
                 dataId = characterData.DataId,
                 entityId = characterData.EntityId,
                 factionId = characterData.FactionId,
+                publicBools = characterData.PublicBools,
+                publicInts = characterData.PublicInts,
+                publicFloats = characterData.PublicFloats,
             }, callback, extraRequestSerializer: (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
@@ -91,6 +95,9 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int entityId = request.entityId;
             int factionId = request.factionId;
+            IList<CharacterDataBoolean> publicBools = request.publicBools;
+            IList<CharacterDataInt32> publicInts = request.publicInts;
+            IList<CharacterDataFloat32> publicFloats = request.publicFloats;
             if (!NameExtensions.IsValidCharacterName(characterName))
             {
                 result.InvokeError(new ResponseCreateCharacterMessage()
@@ -163,7 +170,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (!DataManager.CanCreateCharacter(dataId, entityId, factionId))
+            if (!DataManager.CanCreateCharacter(dataId, entityId, factionId, publicBools, publicInts, publicFloats))
             {
                 // If there is factions, it must have faction with the id stored in faction dictionary
                 result.InvokeError(new ResponseCreateCharacterMessage()
@@ -175,7 +182,7 @@ namespace MultiplayerARPG.MMO
             string characterId = DataManager.GenerateCharacterId();
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = characterId;
-            DataManager.SetNewPlayerCharacterData(characterData, characterName, dataId, entityId, factionId);
+            DataManager.SetNewPlayerCharacterData(characterData, characterName, dataId, entityId, factionId, publicBools, publicInts, publicFloats);
             DeserializeCreateCharacterExtra(characterData, reader);
             DatabaseApiResult<CharacterResp> createResp = await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
             {
