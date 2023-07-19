@@ -15,6 +15,8 @@ namespace MultiplayerARPG.MMO
 #endif
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
+        protected static readonly NetDataWriter s_Writer = new NetDataWriter();
+
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         // User peers (Login / Register / Manager characters)
         protected readonly Dictionary<long, CentralUserPeerInfo> _userPeers = new Dictionary<long, CentralUserPeerInfo>();
@@ -151,9 +153,9 @@ namespace MultiplayerARPG.MMO
         {
             if (!IsServer)
                 return;
-            NetDataWriter writer = new NetDataWriter();
-            writer.PutPackedUShort((ushort)message);
-            KickClient(connectionId, writer.Data);
+            s_Writer.Reset();
+            s_Writer.PutPackedUShort((ushort)message);
+            KickClient(connectionId, s_Writer.Data);
         }
 
         protected void HandleServerDisconnect(MessageHandlerData messageHandler)
