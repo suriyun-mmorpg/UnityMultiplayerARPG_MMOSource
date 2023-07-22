@@ -27,6 +27,17 @@ namespace MultiplayerARPG.MMO
             return true;
         }
 
+        public static bool ReadConfigs(Dictionary<string, object> config, string configName, out float result, float defaultValue = -1)
+        {
+            result = defaultValue;
+
+            if (config == null || !config.ContainsKey(configName))
+                return false;
+
+            result = (float)(double)config[configName];
+            return true;
+        }
+
         public static bool ReadConfigs(Dictionary<string, object> config, string configName, out bool result, bool defaultValue = false)
         {
             result = defaultValue;
@@ -50,6 +61,22 @@ namespace MultiplayerARPG.MMO
             foreach (var objResult in objResults)
             {
                 result.Add(objResult.Value<string>());
+            }
+            return true;
+        }
+
+        public static bool ReadConfigs<T>(Dictionary<string, object> config, string configName, out List<T> result, List<T> defaultValue = null)
+        {
+            result = defaultValue;
+
+            if (config == null || !config.ContainsKey(configName))
+                return false;
+
+            result = new List<T>();
+            JArray objResults = (JArray)config[configName];
+            foreach (var objResult in objResults)
+            {
+                result.Add(objResult.Value<T>());
             }
             return true;
         }

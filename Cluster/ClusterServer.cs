@@ -599,7 +599,7 @@ namespace MultiplayerARPG.MMO
                 {
                     id = data.id,
                     title = data.title,
-                    maxConnections = data.maxConnections <= 0 ? _centralNetworkManager.defaultChannelMaxConnections : data.maxConnections,
+                    maxConnections = data.maxConnections,
                     connections = connectionCounts.ContainsKey(data.id) ? connectionCounts[data.id] : 0,
                 });
             }

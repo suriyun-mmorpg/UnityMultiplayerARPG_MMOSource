@@ -9,6 +9,13 @@ namespace MultiplayerARPG.MMO
         public const string ARG_CENTRAL_PORT = "-" + CONFIG_CENTRAL_PORT;
         public const string CONFIG_CENTRAL_MAX_CONNECTIONS = "centralMaxConnections";
         public const string ARG_CENTRAL_MAX_CONNECTIONS = "-" + CONFIG_CENTRAL_MAX_CONNECTIONS;
+        // Central channel
+        public const string CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT = "mapSpawnMillisecondsTimeout";
+        public const string ARG_MAP_SPAWN_MILLISECONDS_TIMEOUT = "-" + CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT;
+        public const string CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS = "defaultChannelMaxConnections";
+        public const string ARG_DEFAULT_CHANNEL_MAX_CONNECTIONS = "-" + CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS;
+        public const string CONFIG_CHANNELS = "channels";
+        public const string ARG_CHANNELS = "-" + CONFIG_CHANNELS;
         // Central web-socket connection (for login/character management)
         public const string CONFIG_USE_WEB_SOCKET = "useWebSocket";
         public const string ARG_USE_WEB_SOCKET = "-" + CONFIG_USE_WEB_SOCKET;
