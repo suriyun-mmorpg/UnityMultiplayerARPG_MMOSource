@@ -40,10 +40,11 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-        public bool RequestSelectCharacter(string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
+        public bool RequestSelectCharacter(string channelId, string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestSelectCharacter, new RequestSelectCharacterMessage()
             {
+                channelId = channelId,
                 characterId = characterId,
             }, responseDelegate: callback);
         }
