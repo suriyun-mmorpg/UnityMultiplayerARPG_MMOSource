@@ -18,6 +18,12 @@ namespace MultiplayerARPG.MMO
 #endif
     public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
+        private struct StartingSceneData
+        {
+            public string mapId;
+            public string channelId;
+        }
+
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Central Network Connection")]
 #endif
@@ -33,11 +39,12 @@ namespace MultiplayerARPG.MMO
         public int startPort = 8000;
         public string batchModeArguments = "-batchmode -nographics";
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public List<BaseMapInfo> spawningMaps;
+        public List<BaseMapInfo> spawningMaps = new List<BaseMapInfo>();
 #endif
 #if NET || NETCOREAPP
-        public List<string> spawningMapIds;
+        public List<string> spawningMapIds = new List<string>();
 #endif
+        public List<string> channelIds = new List<string>();
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Running In Editor")]
@@ -63,7 +70,7 @@ namespace MultiplayerARPG.MMO
         /// <summary>
         /// List of Map servers that restarting in update loop
         /// </summary>
-        private readonly ConcurrentQueue<string> _restartingScenes = new ConcurrentQueue<string>();
+        private readonly ConcurrentQueue<StartingSceneData> _restartingScenes = new ConcurrentQueue<StartingSceneData>();
 
         public string ExePath
         {
@@ -118,6 +125,8 @@ namespace MultiplayerARPG.MMO
         {
             useWebSocket = false;
             maxConnections = int.MaxValue;
+            if (channelIds == null || channelIds.Count == 0)
+                channelIds = new List<string>() { "channel_1" };
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
@@ -199,10 +208,9 @@ namespace MultiplayerARPG.MMO
                 {
                     if (_restartingScenes.Count > 0)
                     {
-                        string tempRestartingScenes;
-                        while (_restartingScenes.TryDequeue(out tempRestartingScenes))
+                        while (_restartingScenes.TryDequeue(out StartingSceneData tempRestartingScenes))
                         {
-                            SpawnMap(tempRestartingScenes, true);
+                            SpawnMap(tempRestartingScenes.mapId, tempRestartingScenes.channelId, true);
                         }
                     }
                 }
@@ -278,13 +286,16 @@ namespace MultiplayerARPG.MMO
         {
             foreach (string mapId in spawningMapIds)
             {
-                SpawnMap(mapId, true);
-                // Add some delay before spawn next map
+                foreach (string channelId in channelIds)
+                {
+                    SpawnMap(mapId, channelId, true);
+                    // Add some delay before spawn next map
 #if NET || NETCOREAPP
-                await Task.Delay(100);
+                    await Task.Delay(100);
 #else
-                await UniTask.Delay(100);
+                    await UniTask.Delay(100);
 #endif
+                }
             }
         }
 #endif
@@ -300,13 +311,13 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
             bool autoRestart)
         {
-            SpawnMap(message.mapId, autoRestart, message, result);
+            SpawnMap(message.mapId, message.channelId, autoRestart, message, result);
         }
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
-            string mapId, bool autoRestart,
+            string mapId, string channelId, bool autoRestart,
             RequestSpawnMapMessage? request = null,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
         {
@@ -425,7 +436,13 @@ namespace MultiplayerARPG.MMO
 
                         // Restarting scene
                         if (autoRestart)
-                            _restartingScenes.Enqueue(mapId);
+                        {
+                            _restartingScenes.Enqueue(new StartingSceneData()
+                            {
+                                mapId = mapId,
+                                channelId = channelId,
+                            });
+                        }
 
                         _mainThreadActions.Enqueue(() =>
                         {
@@ -453,7 +470,13 @@ namespace MultiplayerARPG.MMO
 
                 // Restarting scene
                 if (autoRestart)
-                    _restartingScenes.Enqueue(mapId);
+                {
+                    _restartingScenes.Enqueue(new StartingSceneData()
+                    {
+                        mapId = mapId,
+                        channelId = channelId,
+                    });
+                }
 
                 if (LogFatal)
                     Logging.LogException(LogTag, e);

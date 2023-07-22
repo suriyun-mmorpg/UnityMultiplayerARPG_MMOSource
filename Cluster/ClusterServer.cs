@@ -109,8 +109,8 @@ namespace MultiplayerARPG.MMO
                     // Remove disconnect map server
                     if (_mapServerPeers.TryGetValue(eventData.connectionId, out tempPeerInfo))
                     {
-                        _mapServerPeersByMapId.Remove(tempPeerInfo.extra);
-                        _mapServerPeersByInstanceId.Remove(tempPeerInfo.extra);
+                        _mapServerPeersByMapId.Remove(tempPeerInfo.instanceId);
+                        _mapServerPeersByInstanceId.Remove(tempPeerInfo.instanceId);
                         _mapServerPeers.Remove(eventData.connectionId);
                         RemoveMapUsers(eventData.connectionId);
                     }
@@ -164,34 +164,34 @@ namespace MultiplayerARPG.MMO
                         break;
                     case CentralServerPeerType.MapServer:
                         // Extra is map ID
-                        if (!_mapServerPeersByMapId.ContainsKey(peerInfo.extra))
+                        if (!_mapServerPeersByMapId.ContainsKey(peerInfo.instanceId))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Collects server data
-                            _mapServerPeersByMapId[peerInfo.extra] = peerInfo;
+                            _mapServerPeersByMapId[peerInfo.instanceId] = peerInfo;
                             _mapServerPeers[connectionId] = peerInfo;
-                            Logging.Log(LogTag, "Register Map Server: [" + connectionId + "] [" + peerInfo.extra + "]");
+                            Logging.Log(LogTag, "Register Map Server: [" + connectionId + "] [" + peerInfo.instanceId + "]");
                         }
                         else
                         {
                             message = UITextKeys.UI_ERROR_MAP_EXISTED;
-                            Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + peerInfo.extra + "] [" + message + "]");
+                            Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + peerInfo.instanceId + "] [" + message + "]");
                         }
                         break;
                     case CentralServerPeerType.InstanceMapServer:
                         // Extra is instance ID
-                        if (!_mapServerPeersByInstanceId.ContainsKey(peerInfo.extra))
+                        if (!_mapServerPeersByInstanceId.ContainsKey(peerInfo.instanceId))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Collects server data
-                            _mapServerPeersByInstanceId[peerInfo.extra] = peerInfo;
+                            _mapServerPeersByInstanceId[peerInfo.instanceId] = peerInfo;
                             _mapServerPeers[connectionId] = peerInfo;
-                            Logging.Log(LogTag, "Register Instance Map Server: [" + connectionId + "] [" + peerInfo.extra + "]");
+                            Logging.Log(LogTag, "Register Instance Map Server: [" + connectionId + "] [" + peerInfo.instanceId + "]");
                         }
                         else
                         {
                             message = UITextKeys.UI_ERROR_EVENT_EXISTED;
-                            Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + peerInfo.extra + "] [" + message + "]");
+                            Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + peerInfo.instanceId + "] [" + message + "]");
                         }
                         break;
                 }

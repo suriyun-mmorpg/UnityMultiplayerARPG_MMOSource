@@ -104,7 +104,7 @@ namespace MultiplayerARPG.MMO
                 peerType = _appServer.PeerType,
                 networkAddress = _appServer.AppAddress,
                 networkPort = _appServer.AppPort,
-                extra = _appServer.AppExtra,
+                instanceId = _appServer.AppExtra,
             });
         }
 #endif

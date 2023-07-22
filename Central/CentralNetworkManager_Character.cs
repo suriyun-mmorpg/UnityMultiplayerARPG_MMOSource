@@ -292,7 +292,7 @@ namespace MultiplayerARPG.MMO
             // Response
             result.InvokeSuccess(new ResponseSelectCharacterMessage()
             {
-                sceneName = mapServerPeerInfo.extra,
+                sceneName = mapServerPeerInfo.instanceId,
                 networkAddress = mapServerPeerInfo.networkAddress,
                 networkPort = mapServerPeerInfo.networkPort,
             });

@@ -6,6 +6,7 @@ namespace MultiplayerARPG.MMO
     public struct RequestSpawnMapMessage : INetSerializable
     {
         public string mapId;
+        public string channelId;
         public string instanceId;
         public Vector3 instanceWarpPosition;
         public bool instanceWarpOverrideRotation;
@@ -15,6 +16,7 @@ namespace MultiplayerARPG.MMO
         public void Deserialize(NetDataReader reader)
         {
             mapId = reader.GetString();
+            channelId = reader.GetString();
             instanceId = reader.GetString();
             instanceWarpPosition = reader.GetVector3();
             instanceWarpOverrideRotation = reader.GetBool();
@@ -25,6 +27,7 @@ namespace MultiplayerARPG.MMO
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(mapId);
+            writer.Put(channelId);
             writer.Put(instanceId);
             writer.PutVector3(instanceWarpPosition);
             writer.Put(instanceWarpOverrideRotation);
