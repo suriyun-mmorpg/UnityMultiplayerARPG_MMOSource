@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
         public string batchModeArguments = "-batchmode -nographics";
-        public List<string> channelIds = new List<string>();
+        public List<string> spawningChannelIds = new List<string>();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps = new List<BaseMapInfo>();
 #endif
@@ -126,8 +126,8 @@ namespace MultiplayerARPG.MMO
         {
             useWebSocket = false;
             maxConnections = int.MaxValue;
-            if (channelIds == null || channelIds.Count == 0)
-                channelIds = new List<string>() { "default" };
+            if (spawningChannelIds == null || spawningChannelIds.Count == 0)
+                spawningChannelIds = new List<string>() { "default" };
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
@@ -287,7 +287,7 @@ namespace MultiplayerARPG.MMO
         {
             foreach (string mapName in spawningMapNames)
             {
-                foreach (string channelId in channelIds)
+                foreach (string channelId in spawningChannelIds)
                 {
                     SpawnMap(channelId, mapName, true);
                     // Add some delay before spawn next map

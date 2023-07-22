@@ -34,6 +34,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_SPAWN_START_PORT = "-" + CONFIG_SPAWN_START_PORT;
         public const string CONFIG_SPAWN_MAPS = "spawnMaps";
         public const string ARG_SPAWN_MAPS = "-" + CONFIG_SPAWN_MAPS;
+        public const string CONFIG_SPAWN_CHANNELS = "spawnChannels";
+        public const string ARG_SPAWN_CHANNELS = "-" + CONFIG_SPAWN_CHANNELS;
         // Map server
         public const string CONFIG_MAP_PORT = "mapPort";
         public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
