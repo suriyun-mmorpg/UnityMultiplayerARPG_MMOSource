@@ -2,6 +2,7 @@
 using LiteNetLib.Utils;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MultiplayerARPG.MMO
 {
@@ -281,7 +282,11 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (!ClusterServer.MapServerPeersByMapId.TryGetValue(character.CurrentMapName, out CentralServerPeerInfo mapServerPeerInfo))
+            // Get channel, or use default one
+            string channelId = request.channelId;
+            if (string.IsNullOrEmpty(channelId))
+                channelId = Channels.Keys.First();
+            if (!ClusterServer.MapServerPeersByMapId.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(channelId, character.CurrentMapName), out CentralServerPeerInfo mapServerPeerInfo))
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {
@@ -292,7 +297,7 @@ namespace MultiplayerARPG.MMO
             // Response
             result.InvokeSuccess(new ResponseSelectCharacterMessage()
             {
-                sceneName = mapServerPeerInfo.instanceId,
+                sceneName = mapServerPeerInfo.refId,
                 networkAddress = mapServerPeerInfo.networkAddress,
                 networkPort = mapServerPeerInfo.networkPort,
             });

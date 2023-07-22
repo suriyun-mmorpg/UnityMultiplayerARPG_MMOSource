@@ -6,7 +6,8 @@
         int ClusterServerPort { get; }
         string AppAddress { get; }
         int AppPort { get; }
-        string AppExtra { get; }
+        string ChannelId { get; }
+        string RefId { get; }
         CentralServerPeerType PeerType { get; }
     }
 }

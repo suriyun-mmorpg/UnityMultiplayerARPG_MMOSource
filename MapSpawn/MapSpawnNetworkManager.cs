@@ -20,8 +20,8 @@ namespace MultiplayerARPG.MMO
     {
         private struct StartingSceneData
         {
-            public string mapId;
             public string channelId;
+            public string mapName;
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -38,13 +38,13 @@ namespace MultiplayerARPG.MMO
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
         public string batchModeArguments = "-batchmode -nographics";
+        public List<string> channelIds = new List<string>();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps = new List<BaseMapInfo>();
 #endif
 #if NET || NETCOREAPP
-        public List<string> spawningMapIds = new List<string>();
+        public List<string> spawningMapNames = new List<string>();
 #endif
-        public List<string> channelIds = new List<string>();
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Running In Editor")]
@@ -103,7 +103,8 @@ namespace MultiplayerARPG.MMO
         public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
-        public string AppExtra { get { return string.Empty; } }
+        public string ChannelId { get { return string.Empty; } }
+        public string RefId { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
 
 #if NET || NETCOREAPP
@@ -126,7 +127,7 @@ namespace MultiplayerARPG.MMO
             useWebSocket = false;
             maxConnections = int.MaxValue;
             if (channelIds == null || channelIds.Count == 0)
-                channelIds = new List<string>() { "channel_1" };
+                channelIds = new List<string>() { "default" };
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
@@ -210,7 +211,7 @@ namespace MultiplayerARPG.MMO
                     {
                         while (_restartingScenes.TryDequeue(out StartingSceneData tempRestartingScenes))
                         {
-                            SpawnMap(tempRestartingScenes.mapId, tempRestartingScenes.channelId, true);
+                            SpawnMap(tempRestartingScenes.mapName, tempRestartingScenes.channelId, true);
                         }
                     }
                 }
@@ -243,7 +244,7 @@ namespace MultiplayerARPG.MMO
             UITextKeys message = UITextKeys.NONE;
             if (!ClusterClient.IsAppRegistered)
                 message = UITextKeys.UI_ERROR_APP_NOT_READY;
-            else if (string.IsNullOrEmpty(request.mapId))
+            else if (string.IsNullOrEmpty(request.mapName))
                 message = UITextKeys.UI_ERROR_EMPTY_SCENE_NAME;
 
             if (message != UITextKeys.NONE)
@@ -265,7 +266,7 @@ namespace MultiplayerARPG.MMO
             if (responseCode != AckResponseCode.Success)
                 return;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            List<string> spawningMapIds = new List<string>();
+            List<string> spawningMapNames = new List<string>();
             if (spawningMaps == null || spawningMaps.Count == 0)
             {
                 spawningMaps = new List<BaseMapInfo>();
@@ -273,22 +274,22 @@ namespace MultiplayerARPG.MMO
             }
             foreach (BaseMapInfo spawningMap in spawningMaps)
             {
-                spawningMapIds.Add(spawningMap.Id);
+                spawningMapNames.Add(spawningMap.Id);
             }
 #endif
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            SpawnMaps(spawningMapIds).Forget();
+            SpawnMaps(spawningMapNames).Forget();
 #endif
         }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        private async UniTaskVoid SpawnMaps(List<string> spawningMapIds)
+        private async UniTaskVoid SpawnMaps(List<string> spawningMapNames)
         {
-            foreach (string mapId in spawningMapIds)
+            foreach (string mapName in spawningMapNames)
             {
                 foreach (string channelId in channelIds)
                 {
-                    SpawnMap(mapId, channelId, true);
+                    SpawnMap(channelId, mapName, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
@@ -311,13 +312,13 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
             bool autoRestart)
         {
-            SpawnMap(message.mapId, message.channelId, autoRestart, message, result);
+            SpawnMap(message.channelId, message.mapName, autoRestart, message, result);
         }
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
-            string mapId, string channelId, bool autoRestart,
+            string channelId, string mapName, bool autoRestart,
             RequestSpawnMapMessage? request = null,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
         {
@@ -350,7 +351,8 @@ namespace MultiplayerARPG.MMO
                 CreateNoWindow = false,
                 UseShellExecute = false,
                 Arguments = (!NotSpawnInBatchMode ? batchModeArguments : string.Empty) +
-                    $"  {ProcessArguments.ARG_MAP_ID} {mapId}" +
+                    $"  {ProcessArguments.ARG_CHANNEL_ID} {channelId}" +
+                    $"  {ProcessArguments.ARG_MAP_NAME} {mapName}" +
                     (request.HasValue ?
                         $" {ProcessArguments.ARG_INSTANCE_ID} {request.Value.instanceId}" +
                         $" {ProcessArguments.ARG_INSTANCE_POSITION_X} {request.Value.instanceWarpPosition.x}" +
@@ -439,7 +441,7 @@ namespace MultiplayerARPG.MMO
                         {
                             _restartingScenes.Enqueue(new StartingSceneData()
                             {
-                                mapId = mapId,
+                                mapName = mapName,
                                 channelId = channelId,
                             });
                         }
@@ -473,7 +475,7 @@ namespace MultiplayerARPG.MMO
                 {
                     _restartingScenes.Enqueue(new StartingSceneData()
                     {
-                        mapId = mapId,
+                        mapName = mapName,
                         channelId = channelId,
                     });
                 }

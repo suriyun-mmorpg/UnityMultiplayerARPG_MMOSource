@@ -31,6 +31,8 @@ namespace MultiplayerARPG.MMO
         [Header("Map Spawn")]
 #endif
         public int mapSpawnMillisecondsTimeout = 0;
+        public int defaultChannelMaxConnections = 500;
+        public ChannelData[] channels = new ChannelData[0];
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("User Account")]
@@ -60,6 +62,41 @@ namespace MultiplayerARPG.MMO
         public IDatabaseClient DbServiceClient { get; set; }
         public ICentralServerDataManager DataManager { get; set; }
 #endif
+        private Dictionary<string, ChannelData> _channels;
+        public Dictionary<string, ChannelData> Channels
+        {
+            get
+            {
+                if (_channels == null)
+                {
+                    _channels = new Dictionary<string, ChannelData>();
+                    foreach (ChannelData channel in channels)
+                    {
+                        if (string.IsNullOrEmpty(channel.id))
+                        {
+                            Logging.LogWarning("Cannot add channel with empty ID.");
+                            continue;
+                        }
+                        if (_channels.ContainsKey(channel.id))
+                        {
+                            Logging.LogWarning($"Already has a channel with ID: {channel.id}, it won't being added again.");
+                            continue;
+                        }
+                        _channels[channel.id] = channel;
+                    }
+                    if (_channels.Count == 0)
+                    {
+                        _channels["default"] = new ChannelData()
+                        {
+                            id = "default",
+                            title = "Default",
+                            maxConnections = 500,
+                        };
+                    }
+                }
+                return _channels;
+            }
+        }
 
 #if NET || NETCOREAPP
         public CentralNetworkManager() : base()

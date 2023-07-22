@@ -104,7 +104,8 @@ namespace MultiplayerARPG.MMO
                 peerType = _appServer.PeerType,
                 networkAddress = _appServer.AppAddress,
                 networkPort = _appServer.AppPort,
-                instanceId = _appServer.AppExtra,
+                channelId = _appServer.ChannelId,
+                refId = _appServer.RefId,
             });
         }
 #endif
@@ -164,13 +165,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        public bool RequestAppServerAddress(CentralServerPeerType peerType, string extra)
+        public bool RequestAppServerAddress(CentralServerPeerType peerType, string channelId, string refId)
         {
             Logging.Log(LogTag, "App Address is requesting");
             return SendRequest(MMORequestTypes.RequestAppServerAddress, new RequestAppServerAddressMessage()
             {
                 peerType = peerType,
-                extra = extra,
+                channelId = channelId,
+                refId = refId,
             });
         }
 #endif

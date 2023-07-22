@@ -35,9 +35,15 @@ namespace MultiplayerARPG.MMO
         public IReadOnlyDictionary<long, CentralServerPeerInfo> MapServerPeers => _mapServerPeers;
 
         private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByMapId = new Dictionary<string, CentralServerPeerInfo>();
+        /// <summary>
+        /// Key is `{channelId}_{refId}`
+        /// </summary>
         public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByMapId => _mapServerPeersByMapId;
 
         private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
+        /// <summary>
+        /// Key is `{channelId}_{refId}`
+        /// </summary>
         public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByInstanceId => _mapServerPeersByInstanceId;
 
         // <Request Id, Response Handler> dictionary
@@ -109,8 +115,9 @@ namespace MultiplayerARPG.MMO
                     // Remove disconnect map server
                     if (_mapServerPeers.TryGetValue(eventData.connectionId, out tempPeerInfo))
                     {
-                        _mapServerPeersByMapId.Remove(tempPeerInfo.instanceId);
-                        _mapServerPeersByInstanceId.Remove(tempPeerInfo.instanceId);
+                        string key = tempPeerInfo.GetPeerInfoKey();
+                        _mapServerPeersByMapId.Remove(key);
+                        _mapServerPeersByInstanceId.Remove(key);
                         _mapServerPeers.Remove(eventData.connectionId);
                         RemoveMapUsers(eventData.connectionId);
                     }
@@ -155,6 +162,7 @@ namespace MultiplayerARPG.MMO
             if (request.ValidateHash())
             {
                 CentralServerPeerInfo peerInfo = request.peerInfo;
+                string key = peerInfo.GetPeerInfoKey();
                 peerInfo.connectionId = connectionId;
                 switch (request.peerInfo.peerType)
                 {
@@ -164,34 +172,34 @@ namespace MultiplayerARPG.MMO
                         break;
                     case CentralServerPeerType.MapServer:
                         // Extra is map ID
-                        if (!_mapServerPeersByMapId.ContainsKey(peerInfo.instanceId))
+                        if (!_mapServerPeersByMapId.ContainsKey(key))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Collects server data
-                            _mapServerPeersByMapId[peerInfo.instanceId] = peerInfo;
+                            _mapServerPeersByMapId[key] = peerInfo;
                             _mapServerPeers[connectionId] = peerInfo;
-                            Logging.Log(LogTag, "Register Map Server: [" + connectionId + "] [" + peerInfo.instanceId + "]");
+                            Logging.Log(LogTag, "Register Map Server: [" + connectionId + "] [" + key + "]");
                         }
                         else
                         {
                             message = UITextKeys.UI_ERROR_MAP_EXISTED;
-                            Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + peerInfo.instanceId + "] [" + message + "]");
+                            Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + key + "] [" + message + "]");
                         }
                         break;
                     case CentralServerPeerType.InstanceMapServer:
                         // Extra is instance ID
-                        if (!_mapServerPeersByInstanceId.ContainsKey(peerInfo.instanceId))
+                        if (!_mapServerPeersByInstanceId.ContainsKey(key))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Collects server data
-                            _mapServerPeersByInstanceId[peerInfo.instanceId] = peerInfo;
+                            _mapServerPeersByInstanceId[key] = peerInfo;
                             _mapServerPeers[connectionId] = peerInfo;
-                            Logging.Log(LogTag, "Register Instance Map Server: [" + connectionId + "] [" + peerInfo.instanceId + "]");
+                            Logging.Log(LogTag, "Register Instance Map Server: [" + connectionId + "] [" + key + "]");
                         }
                         else
                         {
                             message = UITextKeys.UI_ERROR_EVENT_EXISTED;
-                            Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + peerInfo.instanceId + "] [" + message + "]");
+                            Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + key + "] [" + message + "]");
                         }
                         break;
                 }
@@ -248,6 +256,7 @@ namespace MultiplayerARPG.MMO
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
+            string key = request.GetPeerInfoKey();
             switch (request.peerType)
             {
                 // TODO: Balancing servers when there are multiple servers with same type
@@ -264,19 +273,17 @@ namespace MultiplayerARPG.MMO
                     }
                     break;
                 case CentralServerPeerType.MapServer:
-                    string mapName = request.extra;
-                    if (!_mapServerPeersByMapId.TryGetValue(mapName, out peerInfo))
+                    if (!_mapServerPeersByMapId.TryGetValue(key, out peerInfo))
                     {
                         message = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
-                        Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + mapName + "] [" + message + "]");
+                        Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + key + "] [" + message + "]");
                     }
                     break;
                 case CentralServerPeerType.InstanceMapServer:
-                    string instanceId = request.extra;
-                    if (!_mapServerPeersByInstanceId.TryGetValue(instanceId, out peerInfo))
+                    if (!_mapServerPeersByInstanceId.TryGetValue(key, out peerInfo))
                     {
                         message = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
-                        Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + instanceId + "] [" + message + "]");
+                        Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + key + "] [" + message + "]");
                     }
                     break;
             }
@@ -505,7 +512,7 @@ namespace MultiplayerARPG.MMO
         {
             return RequestSpawnMap(connectionId, new RequestSpawnMapMessage()
             {
-                mapId = sceneName,
+                mapName = sceneName,
                 instanceId = instanceId,
                 instanceWarpPosition = instanceWarpPosition,
                 instanceWarpOverrideRotation = instanceWarpOverrideRotation,

@@ -14,5 +14,7 @@
         public const ushort RequestSpawnMap = 9;
         public const ushort RequestValidateAccessToken = 10;
         public const ushort RequestUserCount = 11;
+        public const ushort RequestAppServerReady = 12;
+        public const ushort RequestAppServerAllocate = 13;
     }
 }

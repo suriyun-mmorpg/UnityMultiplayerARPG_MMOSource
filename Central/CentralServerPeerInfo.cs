@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         public string networkAddress;
         public int networkPort;
         public string channelId;
-        public string instanceId;
+        public string refId;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
             networkAddress = reader.GetString();
             networkPort = reader.GetInt();
             channelId = reader.GetString();
-            instanceId = reader.GetString();
+            refId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             writer.Put(networkAddress);
             writer.Put(networkPort);
             writer.Put(channelId);
-            writer.Put(instanceId);
+            writer.Put(refId);
         }
     }
 }

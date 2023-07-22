@@ -41,8 +41,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_MAP_MAX_CONNECTIONS = "-" + CONFIG_MAP_MAX_CONNECTIONS;
         public const string CONFIG_CHANNEL_ID = "channelId";
         public const string ARG_CHANNEL_ID = "-" + CONFIG_CHANNEL_ID;
-        public const string CONFIG_MAP_ID = "mapId";
-        public const string ARG_MAP_ID = "-" + CONFIG_MAP_ID;
+        public const string CONFIG_MAP_NAME = "mapName";
+        public const string ARG_MAP_NAME = "-" + CONFIG_MAP_NAME;
         public const string CONFIG_INSTANCE_ID = "instanceId";
         public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
         public const string CONFIG_INSTANCE_POSITION_X = "instancePositionX";
