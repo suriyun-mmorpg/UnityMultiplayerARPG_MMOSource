@@ -16,5 +16,6 @@
         public const ushort RequestUserCount = 11;
         public const ushort RequestAppServerReady = 12;
         public const ushort RequestAppServerAllocate = 13;
+        public const ushort RequestChannels = 14;
     }
 }

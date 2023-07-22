@@ -165,6 +165,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<RequestDeleteCharacterMessage, ResponseDeleteCharacterMessage>(MMORequestTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterRequestToServer<RequestSelectCharacterMessage, ResponseSelectCharacterMessage>(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
             RegisterRequestToServer<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
+            RegisterRequestToServer<EmptyMessage, ResponseChannelsMessage>(MMORequestTypes.RequestChannels, HandleRequestChannels);
             // Client messages
             RegisterClientMessage(MMOMessageTypes.Disconnect, HandleServerDisconnect);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
