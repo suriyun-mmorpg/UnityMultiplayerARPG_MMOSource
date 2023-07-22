@@ -606,6 +606,20 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
+        public int GetChannelConnections(string channelId)
+        {
+            int connections = 0;
+            foreach (long connectionId in ConnectionIdsByCharacterId.Values)
+            {
+                if (!_mapServerPeers.ContainsKey(connectionId))
+                    continue;
+                if (!string.Equals(channelId, _mapServerPeers[connectionId].channelId))
+                    continue;
+                connections++;
+            }
+            return connections;
+        }
+
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)
         {
             MD5 algorithm = MD5.Create();  // or use SHA256.Create();

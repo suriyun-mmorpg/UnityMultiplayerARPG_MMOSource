@@ -261,6 +261,26 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Get channel, or use default one
+            string channelId = request.channelId;
+            if (string.IsNullOrEmpty(channelId))
+                channelId = Channels.Keys.First();
+            if (!Channels.TryGetValue(channelId, out ChannelData channel))
+            {
+                result.InvokeError(new ResponseSelectCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_CHANNEL_ID,
+                });
+                return;
+            }
+            if (ClusterServer.GetChannelConnections(channelId) >= channel.maxConnections)
+            {
+                result.InvokeError(new ResponseSelectCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CHANNEL_IS_FULL,
+                });
+                return;
+            }
             DatabaseApiResult<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
             {
                 UserId = userPeerInfo.userId,
@@ -283,10 +303,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            // Get channel, or use default one
-            string channelId = request.channelId;
-            if (string.IsNullOrEmpty(channelId))
-                channelId = Channels.Keys.First();
             if (!ClusterServer.MapServerPeersByMapId.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(channelId, character.CurrentMapName), out CentralServerPeerInfo mapServerPeerInfo))
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
