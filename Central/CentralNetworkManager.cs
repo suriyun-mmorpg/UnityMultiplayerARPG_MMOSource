@@ -90,7 +90,7 @@ namespace MultiplayerARPG.MMO
                         {
                             id = "default",
                             title = "Default",
-                            maxConnections = 500,
+                            maxConnections = defaultChannelMaxConnections,
                         };
                     }
                 }
