@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
@@ -76,7 +77,7 @@ namespace MultiplayerARPG.MMO
             JArray objResults = (JArray)config[configName];
             foreach (var objResult in objResults)
             {
-                result.Add(objResult.Value<T>());
+                result.Add(JsonConvert.DeserializeObject<T>(objResult.ToString()));
             }
             return true;
         }
