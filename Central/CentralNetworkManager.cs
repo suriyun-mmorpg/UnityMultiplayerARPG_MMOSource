@@ -115,6 +115,8 @@ namespace MultiplayerARPG.MMO
 
         protected virtual void Initialize()
         {
+            if (defaultChannelMaxConnections <= 0)
+                defaultChannelMaxConnections = 500;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             minCharacterNameLength = GameInstance.Singleton.minCharacterNameLength;
             maxCharacterNameLength = GameInstance.Singleton.maxCharacterNameLength;

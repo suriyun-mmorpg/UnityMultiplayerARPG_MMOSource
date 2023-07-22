@@ -273,7 +273,10 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (ClusterServer.GetChannelConnections(channelId) >= channel.maxConnections)
+            int maxConnections = channel.maxConnections;
+            if (maxConnections <= 0)
+                maxConnections = defaultChannelMaxConnections;
+            if (ClusterServer.GetChannelConnections(channelId) >= maxConnections)
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {
