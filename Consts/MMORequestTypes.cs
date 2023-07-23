@@ -17,5 +17,6 @@
         public const ushort RequestAppServerReady = 12;
         public const ushort RequestAppServerAllocate = 13;
         public const ushort RequestChannels = 14;
+        public const ushort RequestForceDespawnCharacter = 15;
     }
 }

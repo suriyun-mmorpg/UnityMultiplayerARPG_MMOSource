@@ -26,6 +26,9 @@ namespace MultiplayerARPG.MMO
         private Dictionary<string, long> _connectionIdsByCharacterName = new Dictionary<string, long>();
         public IReadOnlyDictionary<string, long> ConnectionIdsByCharacterName => _connectionIdsByCharacterName;
 
+        private Dictionary<string, long> _connectionIdsByDespawningCharacterId = new Dictionary<string, long>();
+        public IReadOnlyDictionary<string, long> ConnectionIdsByDespawningCharacterId => _connectionIdsByDespawningCharacterId;
+
         // Map spawn server peers
         private Dictionary<long, CentralServerPeerInfo> _mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public IReadOnlyDictionary<long, CentralServerPeerInfo> MapSpawnServerPeers => _mapSpawnServerPeers;
@@ -60,6 +63,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
             RegisterRequestHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
             // Map
+            //RegisterResponseHandler<RequestForceDespawnMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawn);
             RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -87,6 +91,7 @@ namespace MultiplayerARPG.MMO
             _mapUsersByCharacterId.Clear();
             _connectionIdsByCharacterId.Clear();
             _connectionIdsByCharacterName.Clear();
+            _connectionIdsByDespawningCharacterId.Clear();
             _mapSpawnServerPeers.Clear();
             _mapServerPeers.Clear();
             _mapServerPeersByMapId.Clear();
@@ -136,17 +141,17 @@ namespace MultiplayerARPG.MMO
             foreach (KeyValuePair<string, SocialCharacterData> entry in mapUsers)
             {
                 // Find characters which connected to disconnecting map server
-                long tempConnectionId;
-                if (!_connectionIdsByCharacterId.TryGetValue(entry.Key, out tempConnectionId) || connectionId != tempConnectionId)
+                if (!_connectionIdsByCharacterId.TryGetValue(entry.Key, out long tempConnectionId) || connectionId != tempConnectionId)
                     continue;
-
-                // Send remove messages to other map servers
-                UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, entry.Value, connectionId);
 
                 // Clear disconnecting map users data
                 _mapUsersByCharacterId.Remove(entry.Key);
                 _connectionIdsByCharacterId.Remove(entry.Key);
                 _connectionIdsByCharacterName.Remove(entry.Value.characterName);
+                _connectionIdsByDespawningCharacterId[entry.Key] = connectionId;
+
+                // Send remove message to other map servers
+                UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, entry.Value, connectionId);
             }
         }
 #endif
@@ -337,32 +342,34 @@ namespace MultiplayerARPG.MMO
         {
             long connectionId = messageHandler.ConnectionId;
             UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
-            SocialCharacterData userData;
+            SocialCharacterData character = message.character;
             switch (message.type)
             {
                 case UpdateUserCharacterMessage.UpdateType.Add:
-                    if (!_mapUsersByCharacterId.ContainsKey(message.character.id))
+                    if (!_mapUsersByCharacterId.ContainsKey(character.id))
                     {
-                        _mapUsersByCharacterId[message.character.id] = message.character;
-                        _connectionIdsByCharacterId[message.character.id] = connectionId;
-                        _connectionIdsByCharacterName[message.character.characterName] = connectionId;
-                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.character, connectionId);
+                        _mapUsersByCharacterId[character.id] = character;
+                        _connectionIdsByCharacterId[character.id] = connectionId;
+                        _connectionIdsByCharacterName[character.characterName] = connectionId;
+                        _connectionIdsByDespawningCharacterId.Remove(character.id);
+                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, character, connectionId);
                     }
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Remove:
-                    if (_mapUsersByCharacterId.TryGetValue(message.character.id, out userData))
+                    if (_mapUsersByCharacterId.TryGetValue(message.character.id, out character))
                     {
-                        _mapUsersByCharacterId.Remove(userData.id);
-                        _connectionIdsByCharacterId.Remove(userData.id);
-                        _connectionIdsByCharacterName.Remove(userData.characterName);
-                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
+                        _mapUsersByCharacterId.Remove(character.id);
+                        _connectionIdsByCharacterId.Remove(character.id);
+                        _connectionIdsByCharacterName.Remove(character.characterName);
+                        _connectionIdsByDespawningCharacterId[character.id] = connectionId;
+                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, character, connectionId);
                     }
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Online:
-                    if (_mapUsersByCharacterId.ContainsKey(message.character.id))
+                    if (_mapUsersByCharacterId.ContainsKey(character.id))
                     {
-                        _mapUsersByCharacterId[message.character.id] = message.character;
-                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.character, connectionId);
+                        _mapUsersByCharacterId[character.id] = character;
+                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, character, connectionId);
                     }
                     break;
             }
@@ -626,6 +633,41 @@ namespace MultiplayerARPG.MMO
 #else
             return 0;
 #endif
+        }
+
+        public async UniTask<bool> ConfirmDespawnCharacter(string characterId)
+        {
+            if (!_connectionIdsByDespawningCharacterId.TryGetValue(characterId, out long connectionId))
+            {
+                // No despawning character, so it may not played by player or already despawned
+                return true;
+            }
+            if (!_mapServerPeers.ContainsKey(connectionId))
+            {
+                // No map-server peer, it may be disconnected, so determine that it is despawned
+                return true;
+            }
+            AsyncResponseData<EmptyMessage> result = await SendRequestAsync<RequestForceDespawnCharacterMessage, EmptyMessage>(connectionId, MMORequestTypes.RequestForceDespawnCharacter, new RequestForceDespawnCharacterMessage()
+            {
+                characterId = characterId,
+            });
+            switch (result.ResponseCode)
+            {
+                case AckResponseCode.Success:
+                    // Confirmed by map-server that the character was despawned, so it can be removed from despawning collection
+                    _connectionIdsByDespawningCharacterId.Remove(characterId);
+                    return true;
+                case AckResponseCode.Timeout:
+                    Debug.LogError("Timeout");
+                    break;
+                case AckResponseCode.Error:
+                    Debug.LogError("Error");
+                    break;
+                case AckResponseCode.Unimplemented:
+                    Debug.LogError("Unimplemented");
+                    break;
+            }
+            return false;
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)

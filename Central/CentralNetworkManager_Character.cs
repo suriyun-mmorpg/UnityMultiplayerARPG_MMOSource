@@ -261,6 +261,15 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Kick player's character from map-servers
+            if (!await ClusterServer.ConfirmDespawnCharacter(request.characterId))
+            {
+                result.InvokeError(new ResponseSelectCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_ALREADY_LOGGED_IN,
+                });
+                return;
+            }
             // Get channel, or use default one
             string channelId = request.channelId;
             if (string.IsNullOrEmpty(channelId))
