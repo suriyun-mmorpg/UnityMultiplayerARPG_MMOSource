@@ -582,6 +582,7 @@ namespace MultiplayerARPG.MMO
 
         public List<ChannelEntry> GetChannels()
         {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             Dictionary<string, int> connectionCounts = new Dictionary<string, int>();
             foreach (long connectionId in ConnectionIdsByCharacterId.Values)
             {
@@ -604,10 +605,14 @@ namespace MultiplayerARPG.MMO
                 });
             }
             return result;
+#else
+            return new List<ChannelEntry>();
+#endif
         }
 
         public int GetChannelConnections(string channelId)
         {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             int connections = 0;
             foreach (long connectionId in ConnectionIdsByCharacterId.Values)
             {
@@ -618,6 +623,9 @@ namespace MultiplayerARPG.MMO
                 connections++;
             }
             return connections;
+#else
+            return 0;
+#endif
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)
