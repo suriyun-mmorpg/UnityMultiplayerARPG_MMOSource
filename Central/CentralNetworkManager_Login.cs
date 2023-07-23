@@ -40,6 +40,11 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
+        public bool RequestChannels(ResponseDelegate<ResponseChannelsMessage> callback)
+        {
+            return ClientSendRequest(MMORequestTypes.RequestChannels, EmptyMessage.Value, responseDelegate: callback);
+        }
+
         protected async UniTaskVoid HandleRequestUserLogin(
             RequestHandlerData requestHandler,
             RequestUserLoginMessage request,
@@ -392,6 +397,21 @@ namespace MultiplayerARPG.MMO
                 userId = userId,
                 accessToken = accessToken,
             });
+#endif
+        }
+
+        protected async UniTaskVoid HandleRequestChannels(
+            RequestHandlerData requestHandler,
+            EmptyMessage request,
+            RequestProceedResultDelegate<ResponseChannelsMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            // Response
+            result.InvokeSuccess(new ResponseChannelsMessage()
+            {
+                channels = ClusterServer.GetChannels(),
+            });
+            await UniTask.Yield();
 #endif
         }
     }

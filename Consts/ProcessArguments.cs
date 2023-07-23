@@ -9,6 +9,13 @@ namespace MultiplayerARPG.MMO
         public const string ARG_CENTRAL_PORT = "-" + CONFIG_CENTRAL_PORT;
         public const string CONFIG_CENTRAL_MAX_CONNECTIONS = "centralMaxConnections";
         public const string ARG_CENTRAL_MAX_CONNECTIONS = "-" + CONFIG_CENTRAL_MAX_CONNECTIONS;
+        // Central channel
+        public const string CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT = "mapSpawnMillisecondsTimeout";
+        public const string ARG_MAP_SPAWN_MILLISECONDS_TIMEOUT = "-" + CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT;
+        public const string CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS = "defaultChannelMaxConnections";
+        public const string ARG_DEFAULT_CHANNEL_MAX_CONNECTIONS = "-" + CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS;
+        public const string CONFIG_CHANNELS = "channels";
+        public const string ARG_CHANNELS = "-" + CONFIG_CHANNELS;
         // Central web-socket connection (for login/character management)
         public const string CONFIG_USE_WEB_SOCKET = "useWebSocket";
         public const string ARG_USE_WEB_SOCKET = "-" + CONFIG_USE_WEB_SOCKET;
@@ -34,13 +41,17 @@ namespace MultiplayerARPG.MMO
         public const string ARG_SPAWN_START_PORT = "-" + CONFIG_SPAWN_START_PORT;
         public const string CONFIG_SPAWN_MAPS = "spawnMaps";
         public const string ARG_SPAWN_MAPS = "-" + CONFIG_SPAWN_MAPS;
+        public const string CONFIG_SPAWN_CHANNELS = "spawnChannels";
+        public const string ARG_SPAWN_CHANNELS = "-" + CONFIG_SPAWN_CHANNELS;
         // Map server
         public const string CONFIG_MAP_PORT = "mapPort";
         public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
         public const string CONFIG_MAP_MAX_CONNECTIONS = "mapMaxConnections";
         public const string ARG_MAP_MAX_CONNECTIONS = "-" + CONFIG_MAP_MAX_CONNECTIONS;
-        public const string CONFIG_MAP_ID = "mapId";
-        public const string ARG_MAP_ID = "-" + CONFIG_MAP_ID;
+        public const string CONFIG_CHANNEL_ID = "channelId";
+        public const string ARG_CHANNEL_ID = "-" + CONFIG_CHANNEL_ID;
+        public const string CONFIG_MAP_NAME = "mapName";
+        public const string ARG_MAP_NAME = "-" + CONFIG_MAP_NAME;
         public const string CONFIG_INSTANCE_ID = "instanceId";
         public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
         public const string CONFIG_INSTANCE_POSITION_X = "instancePositionX";
