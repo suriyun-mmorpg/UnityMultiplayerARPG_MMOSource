@@ -63,7 +63,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
             RegisterRequestHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
             // Map
-            //RegisterResponseHandler<RequestForceDespawnMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawn);
+            RegisterResponseHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter);
             RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
