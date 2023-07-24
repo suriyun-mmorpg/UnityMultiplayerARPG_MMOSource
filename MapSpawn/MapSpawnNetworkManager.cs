@@ -22,7 +22,11 @@ namespace MultiplayerARPG.MMO
         {
             public string channelId;
             public string mapName;
+            public bool isAllocate;
+            public string instanceId;
         }
+
+        public const string ALLOCATE_CHANNEL_ID = "__ALLOC__";
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Central Network Connection")]
@@ -41,9 +45,11 @@ namespace MultiplayerARPG.MMO
         public List<string> spawningChannelIds = new List<string>();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps = new List<BaseMapInfo>();
+        public List<SpawnAllocateMapData> spawningAllocateMaps = new List<SpawnAllocateMapData>();
 #endif
 #if NET || NETCOREAPP
-        public List<string> spawningMapNames = new List<string>();
+        public List<string> spawningMapByNames = new List<string>();
+        public List<SpawnAllocateMapByNameData> spawningAllocateMapByNames = new List<SpawnAllocateMapByNameData>();
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -209,9 +215,9 @@ namespace MultiplayerARPG.MMO
                 {
                     if (_restartingScenes.Count > 0)
                     {
-                        while (_restartingScenes.TryDequeue(out StartingSceneData tempRestartingScenes))
+                        while (_restartingScenes.TryDequeue(out StartingSceneData startSceneData))
                         {
-                            SpawnMap(tempRestartingScenes.mapName, tempRestartingScenes.channelId, true);
+                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, startSceneData.instanceId, Vector3.zero, false, Vector3.zero, true);
                         }
                     }
                 }
@@ -254,10 +260,7 @@ namespace MultiplayerARPG.MMO
                     message = message
                 });
             }
-            else
-            {
-                SpawnMap(request, result, false);
-            }
+            SpawnMap(request, result, false);
         }
 #endif
 
@@ -266,7 +269,7 @@ namespace MultiplayerARPG.MMO
             if (responseCode != AckResponseCode.Success)
                 return;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            List<string> spawningMapNames = new List<string>();
+            List<string> spawningMapByNames = new List<string>();
             if (spawningMaps == null || spawningMaps.Count == 0)
             {
                 spawningMaps = new List<BaseMapInfo>();
@@ -274,22 +277,36 @@ namespace MultiplayerARPG.MMO
             }
             foreach (BaseMapInfo spawningMap in spawningMaps)
             {
-                spawningMapNames.Add(spawningMap.Id);
+                if (spawningMap == null || !spawningMap.IsSceneSet())
+                    continue;
+                spawningMapByNames.Add(spawningMap.Id);
+            }
+            List<SpawnAllocateMapByNameData> spawningAllocateMapByNames = new List<SpawnAllocateMapByNameData>();
+            foreach (SpawnAllocateMapData spawningAllocateMap in spawningAllocateMaps)
+            {
+                if (spawningAllocateMap.mapInfo == null || !spawningAllocateMap.mapInfo.IsSceneSet())
+                    continue;
+                spawningAllocateMapByNames.Add(new SpawnAllocateMapByNameData()
+                {
+                    mapName = spawningAllocateMap.mapInfo.Id,
+                    allocateAmount = spawningAllocateMap.allocateAmount,
+                });
             }
 #endif
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            SpawnMaps(spawningMapNames).Forget();
+            SpawnMaps(spawningMapByNames).Forget();
+            SpawnAllocateMaps(spawningAllocateMapByNames).Forget();
 #endif
         }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        private async UniTaskVoid SpawnMaps(List<string> spawningMapNames)
+        private async UniTaskVoid SpawnMaps(List<string> list)
         {
-            foreach (string mapName in spawningMapNames)
+            foreach (string entry in list)
             {
                 foreach (string channelId in spawningChannelIds)
                 {
-                    SpawnMap(channelId, mapName, true);
+                    SpawnMap(channelId, entry, false, string.Empty, Vector3.zero, false, Vector3.zero, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
@@ -301,7 +318,26 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-                private void FreePort(int port)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+        private async UniTaskVoid SpawnAllocateMaps(List<SpawnAllocateMapByNameData> list)
+        {
+            foreach (SpawnAllocateMapByNameData entry in list)
+            {
+                for (int i = 0; i < entry.allocateAmount; ++i)
+                {
+                    SpawnMap(ALLOCATE_CHANNEL_ID, entry.mapName, true, $"{ALLOCATE_CHANNEL_ID}_{i}", Vector3.zero, false, Vector3.zero, true);
+                    // Add some delay before spawn next map
+#if NET || NETCOREAPP
+                    await Task.Delay(100);
+#else
+                    await UniTask.Delay(100);
+#endif
+                }
+            }
+        }
+#endif
+
+        private void FreePort(int port)
         {
             _freePorts.Enqueue(port);
         }
@@ -312,14 +348,15 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
             bool autoRestart)
         {
-            SpawnMap(message.channelId, message.mapName, autoRestart, message, result);
+            SpawnMap(message.channelId, message.mapName, false, message.instanceId, message.instanceWarpPosition, message.instanceWarpOverrideRotation, message.instanceWarpRotation, autoRestart, result);
         }
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
-            string channelId, string mapName, bool autoRestart,
-            RequestSpawnMapMessage? request = null,
+            string channelId, string mapName, bool isAllocate,
+            string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation,
+            bool autoRestart,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
         {
             // Port to run map server
@@ -353,15 +390,19 @@ namespace MultiplayerARPG.MMO
                 Arguments = (!NotSpawnInBatchMode ? batchModeArguments : string.Empty) +
                     $"  {ProcessArguments.ARG_CHANNEL_ID} {channelId}" +
                     $"  {ProcessArguments.ARG_MAP_NAME} {mapName}" +
-                    (request.HasValue ?
-                        $" {ProcessArguments.ARG_INSTANCE_ID} {request.Value.instanceId}" +
-                        $" {ProcessArguments.ARG_INSTANCE_POSITION_X} {request.Value.instanceWarpPosition.x}" +
-                        $" {ProcessArguments.ARG_INSTANCE_POSITION_Y} {request.Value.instanceWarpPosition.y}" +
-                        $" {ProcessArguments.ARG_INSTANCE_POSITION_Z} {request.Value.instanceWarpPosition.z}" +
-                        $" {(request.Value.instanceWarpOverrideRotation ? ProcessArguments.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)}" +
-                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_X} {request.Value.instanceWarpRotation.x}" +
-                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_Y} {request.Value.instanceWarpRotation.y}" +
-                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_Z} {request.Value.instanceWarpRotation.z}"
+                    (isAllocate ?
+                        $" {ProcessArguments.ARG_ALLOCATE}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ID} {instanceId}"
+                        : string.Empty) +
+                    (!isAllocate && !string.IsNullOrEmpty(instanceId) ?
+                        $" {ProcessArguments.ARG_INSTANCE_ID} {instanceId}" +
+                        $" {ProcessArguments.ARG_INSTANCE_POSITION_X} {instanceWarpPosition.x}" +
+                        $" {ProcessArguments.ARG_INSTANCE_POSITION_Y} {instanceWarpPosition.y}" +
+                        $" {ProcessArguments.ARG_INSTANCE_POSITION_Z} {instanceWarpPosition.z}" +
+                        $" {(instanceWarpOverrideRotation ? ProcessArguments.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_X} {instanceWarpRotation.x}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_Y} {instanceWarpRotation.y}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ROTATION_Z} {instanceWarpRotation.z}"
                         : string.Empty) +
                     $" {ProcessArguments.ARG_CENTRAL_ADDRESS} {clusterServerAddress}" +
                     $" {ProcessArguments.ARG_CENTRAL_PORT} {clusterServerPort}" +
@@ -393,13 +434,11 @@ namespace MultiplayerARPG.MMO
                                 if (LogInfo)
                                     Logging.Log(LogTag, "Process started. Id: " + processId);
                                 // Notify server that it's successfully handled the request
-                                if (request.HasValue && result != null)
+                                if (result != null)
                                 {
                                     result.InvokeSuccess(new ResponseSpawnMapMessage()
                                     {
                                         message = UITextKeys.NONE,
-                                        instanceId = request.Value.instanceId,
-                                        requestId = request.Value.requestId,
                                     });
                                 }
                             });
@@ -419,13 +458,11 @@ namespace MultiplayerARPG.MMO
                                 }
 
                                 // Notify server that it failed to spawn map scene handled the request
-                                if (request.HasValue && result != null)
+                                if (result != null)
                                 {
                                     result.InvokeError(new ResponseSpawnMapMessage()
                                     {
                                         message = UITextKeys.UI_ERROR_CANNOT_EXCUTE_MAP_SERVER,
-                                        instanceId = request.Value.instanceId,
-                                        requestId = request.Value.requestId,
                                     });
                                 }
                             });
@@ -441,8 +478,10 @@ namespace MultiplayerARPG.MMO
                         {
                             _restartingScenes.Enqueue(new StartingSceneData()
                             {
-                                mapName = mapName,
                                 channelId = channelId,
+                                mapName = mapName,
+                                isAllocate = isAllocate,
+                                instanceId = instanceId,
                             });
                         }
 
@@ -460,13 +499,11 @@ namespace MultiplayerARPG.MMO
             }
             catch (Exception e)
             {
-                if (request.HasValue && result != null)
+                if (result != null)
                 {
                     result.InvokeError(new ResponseSpawnMapMessage()
                     {
                         message = UITextKeys.UI_ERROR_UNKNOW,
-                        instanceId = request.Value.instanceId,
-                        requestId = request.Value.requestId,
                     });
                 }
 
@@ -475,8 +512,10 @@ namespace MultiplayerARPG.MMO
                 {
                     _restartingScenes.Enqueue(new StartingSceneData()
                     {
-                        mapName = mapName,
                         channelId = channelId,
+                        mapName = mapName,
+                        isAllocate = isAllocate,
+                        instanceId = instanceId,
                     });
                 }
 

@@ -5,5 +5,6 @@
         MapSpawnServer,
         MapServer,
         InstanceMapServer,
+        AllocateMapServer,
     }
 }
