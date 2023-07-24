@@ -217,7 +217,7 @@ namespace MultiplayerARPG.MMO
                     {
                         while (_restartingScenes.TryDequeue(out StartingSceneData startSceneData))
                         {
-                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, startSceneData.instanceId, Vector3.zero, false, Vector3.zero, true);
+                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, startSceneData.instanceId, default, false, default, true);
                         }
                     }
                 }
@@ -306,7 +306,7 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (string channelId in spawningChannelIds)
                 {
-                    SpawnMap(channelId, entry, false, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                    SpawnMap(channelId, entry, false, string.Empty, default, false, default, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
@@ -325,7 +325,7 @@ namespace MultiplayerARPG.MMO
             {
                 for (int i = 0; i < entry.allocateAmount; ++i)
                 {
-                    SpawnMap(ALLOCATE_CHANNEL_ID, entry.mapName, true, $"{ALLOCATE_CHANNEL_ID}_{i}", Vector3.zero, false, Vector3.zero, true);
+                    SpawnMap(ALLOCATE_CHANNEL_ID, entry.mapName, true, $"{ALLOCATE_CHANNEL_ID}_{i}", default, false, default, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
@@ -355,7 +355,7 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
             string channelId, string mapName, bool isAllocate,
-            string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation,
+            string instanceId, Vec3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vec3 instanceWarpRotation,
             bool autoRestart,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
         {

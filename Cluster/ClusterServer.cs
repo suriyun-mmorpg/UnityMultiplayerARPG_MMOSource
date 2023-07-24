@@ -567,7 +567,7 @@ namespace MultiplayerARPG.MMO
         public async UniTask RequestSpawnMap(long mapSpawnConnectionId, RequestSpawnMapMessage request, string key, RequestProceedResultDelegate<ResponseSpawnMapMessage> resultForMapServer)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            AsyncResponseData<ResponseSpawnMapMessage> spawnResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(mapSpawnConnectionId, MMORequestTypes.RequestSpawnMap, request, millisecondsTimeout: _centralNetworkManager.mapSpawnMillisecondsTimeout);
+            AsyncResponseData<ResponseSpawnMapMessage> spawnResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(mapSpawnConnectionId, MMORequestTypes.RequestSpawnMap, request, _centralNetworkManager.mapSpawnMillisecondsTimeout);
             if (!spawnResult.IsSuccess)
             {
                 // Send error to map-server immediately
@@ -708,13 +708,13 @@ namespace MultiplayerARPG.MMO
                     _connectionIdsByDespawningCharacterId.Remove(characterId);
                     return true;
                 case AckResponseCode.Timeout:
-                    Debug.LogError("Timeout");
+                    // TODO: May tell client what is happening
                     break;
                 case AckResponseCode.Error:
-                    Debug.LogError("Error");
+                    // TODO: May tell client what is happening
                     break;
                 case AckResponseCode.Unimplemented:
-                    Debug.LogError("Unimplemented");
+                    // TODO: May tell client what is happening
                     break;
             }
 #else

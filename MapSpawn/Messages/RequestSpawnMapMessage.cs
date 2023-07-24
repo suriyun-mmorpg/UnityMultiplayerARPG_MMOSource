@@ -1,5 +1,4 @@
 ﻿using LiteNetLib.Utils;
-using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -8,9 +7,9 @@ namespace MultiplayerARPG.MMO
         public string channelId;
         public string mapName;
         public string instanceId;
-        public Vector3 instanceWarpPosition;
+        public Vec3 instanceWarpPosition;
         public bool instanceWarpOverrideRotation;
-        public Vector3 instanceWarpRotation;
+        public Vec3 instanceWarpRotation;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -19,9 +18,9 @@ namespace MultiplayerARPG.MMO
             instanceId = reader.GetString();
             if (!string.IsNullOrEmpty(instanceId))
             {
-                instanceWarpPosition = reader.GetVector3();
+                instanceWarpPosition = reader.GetValue<Vec3>();
                 instanceWarpOverrideRotation = reader.GetBool();
-                instanceWarpRotation = reader.GetVector3();
+                instanceWarpRotation = reader.GetValue<Vec3>();
             }
         }
 
@@ -32,9 +31,9 @@ namespace MultiplayerARPG.MMO
             writer.Put(instanceId);
             if (!string.IsNullOrEmpty(instanceId))
             {
-                writer.PutVector3(instanceWarpPosition);
+                writer.Put(instanceWarpPosition);
                 writer.Put(instanceWarpOverrideRotation);
-                writer.PutVector3(instanceWarpRotation);
+                writer.Put(instanceWarpRotation);
             }
         }
     }
