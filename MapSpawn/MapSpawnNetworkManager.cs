@@ -23,6 +23,7 @@ namespace MultiplayerARPG.MMO
             public string channelId;
             public string mapName;
             public bool isAllocate;
+            public string instanceId;
         }
 
         public const string ALLOCATE_CHANNEL_ID = "__ALLOC__";
@@ -216,7 +217,7 @@ namespace MultiplayerARPG.MMO
                     {
                         while (_restartingScenes.TryDequeue(out StartingSceneData startSceneData))
                         {
-                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, startSceneData.instanceId, Vector3.zero, false, Vector3.zero, true);
                         }
                     }
                 }
@@ -477,9 +478,10 @@ namespace MultiplayerARPG.MMO
                         {
                             _restartingScenes.Enqueue(new StartingSceneData()
                             {
-                                mapName = mapName,
                                 channelId = channelId,
+                                mapName = mapName,
                                 isAllocate = isAllocate,
+                                instanceId = instanceId,
                             });
                         }
 
@@ -510,9 +512,10 @@ namespace MultiplayerARPG.MMO
                 {
                     _restartingScenes.Enqueue(new StartingSceneData()
                     {
-                        mapName = mapName,
                         channelId = channelId,
+                        mapName = mapName,
                         isAllocate = isAllocate,
+                        instanceId = instanceId,
                     });
                 }
 
