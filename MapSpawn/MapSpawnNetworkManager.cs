@@ -324,7 +324,7 @@ namespace MultiplayerARPG.MMO
             {
                 for (int i = 0; i < entry.allocateAmount; ++i)
                 {
-                    SpawnMap(ALLOCATE_CHANNEL_ID, entry.mapName, true, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                    SpawnMap(ALLOCATE_CHANNEL_ID, entry.mapName, true, $"{ALLOCATE_CHANNEL_ID}_{i}", Vector3.zero, false, Vector3.zero, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
@@ -389,7 +389,10 @@ namespace MultiplayerARPG.MMO
                 Arguments = (!NotSpawnInBatchMode ? batchModeArguments : string.Empty) +
                     $"  {ProcessArguments.ARG_CHANNEL_ID} {channelId}" +
                     $"  {ProcessArguments.ARG_MAP_NAME} {mapName}" +
-                    (isAllocate ? $" {ProcessArguments.ARG_ALLOCATE}" : string.Empty) +
+                    (isAllocate ?
+                        $" {ProcessArguments.ARG_ALLOCATE}" +
+                        $" {ProcessArguments.ARG_INSTANCE_ID} {instanceId}"
+                        : string.Empty) +
                     (!isAllocate && !string.IsNullOrEmpty(instanceId) ?
                         $" {ProcessArguments.ARG_INSTANCE_ID} {instanceId}" +
                         $" {ProcessArguments.ARG_INSTANCE_POSITION_X} {instanceWarpPosition.x}" +
