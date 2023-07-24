@@ -22,6 +22,7 @@ namespace MultiplayerARPG.MMO
         {
             public string channelId;
             public string mapName;
+            public bool isAllocate;
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -41,11 +42,11 @@ namespace MultiplayerARPG.MMO
         public List<string> spawningChannelIds = new List<string>();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public List<BaseMapInfo> spawningMaps = new List<BaseMapInfo>();
-        public List<InstanceMapAllocatingData> spawningInstanceMaps = new List<InstanceMapAllocatingData>();
+        public List<SpawnAllocateMapData> spawningAllocateMaps = new List<SpawnAllocateMapData>();
 #endif
 #if NET || NETCOREAPP
         public List<string> spawningMapByNames = new List<string>();
-        public List<InstanceMapIdAllocatingData> spawningInstanceMapsByNames = new List<InstanceMapIdAllocatingData>();
+        public List<SpawnAllocateMapByNameData> spawningAllocateMapByNames = new List<SpawnAllocateMapByNameData>();
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -211,9 +212,9 @@ namespace MultiplayerARPG.MMO
                 {
                     if (_restartingScenes.Count > 0)
                     {
-                        while (_restartingScenes.TryDequeue(out StartingSceneData tempRestartingScenes))
+                        while (_restartingScenes.TryDequeue(out StartingSceneData startSceneData))
                         {
-                            SpawnMap(tempRestartingScenes.mapName, tempRestartingScenes.channelId, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, string.Empty, Vector3.zero, false, Vector3.zero, true);
                         }
                     }
                 }
@@ -273,22 +274,55 @@ namespace MultiplayerARPG.MMO
             }
             foreach (BaseMapInfo spawningMap in spawningMaps)
             {
+                if (spawningMap == null || !spawningMap.IsSceneSet())
+                    continue;
                 spawningMapByNames.Add(spawningMap.Id);
+            }
+            List<SpawnAllocateMapByNameData> spawningAllocateMapByNames = new List<SpawnAllocateMapByNameData>();
+            foreach (SpawnAllocateMapData spawningAllocateMap in spawningAllocateMaps)
+            {
+                if (spawningAllocateMap.mapInfo == null || !spawningAllocateMap.mapInfo.IsSceneSet())
+                    continue;
+                spawningAllocateMapByNames.Add(new SpawnAllocateMapByNameData()
+                {
+                    mapName = spawningAllocateMap.mapInfo.Id,
+                    allocateAmount = spawningAllocateMap.allocateAmount,
+                });
             }
 #endif
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             SpawnMaps(spawningMapByNames).Forget();
+            SpawnAllocateMaps(spawningAllocateMapByNames).Forget();
 #endif
         }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        private async UniTaskVoid SpawnMaps(List<string> spawningMapByNames)
+        private async UniTaskVoid SpawnMaps(List<string> list)
         {
-            foreach (string mapName in spawningMapByNames)
+            foreach (string entry in list)
             {
                 foreach (string channelId in spawningChannelIds)
                 {
-                    SpawnMap(channelId, mapName, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                    SpawnMap(channelId, entry, false, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                    // Add some delay before spawn next map
+#if NET || NETCOREAPP
+                    await Task.Delay(100);
+#else
+                    await UniTask.Delay(100);
+#endif
+                }
+            }
+        }
+#endif
+
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+        private async UniTaskVoid SpawnAllocateMaps(List<SpawnAllocateMapByNameData> list)
+        {
+            foreach (SpawnAllocateMapByNameData entry in list)
+            {
+                for (int i = 0; i < entry.allocateAmount; ++i)
+                {
+                    SpawnMap(string.Empty, entry.mapName, true, string.Empty, Vector3.zero, false, Vector3.zero, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
@@ -311,13 +345,13 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
             bool autoRestart)
         {
-            SpawnMap(message.channelId, message.mapName, message.instanceId, message.instanceWarpPosition, message.instanceWarpOverrideRotation, message.instanceWarpRotation, autoRestart, result);
+            SpawnMap(message.channelId, message.mapName, false, message.instanceId, message.instanceWarpPosition, message.instanceWarpOverrideRotation, message.instanceWarpRotation, autoRestart, result);
         }
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
-            string channelId, string mapName,
+            string channelId, string mapName, bool isAllocate,
             string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation,
             bool autoRestart,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
@@ -353,7 +387,8 @@ namespace MultiplayerARPG.MMO
                 Arguments = (!NotSpawnInBatchMode ? batchModeArguments : string.Empty) +
                     $"  {ProcessArguments.ARG_CHANNEL_ID} {channelId}" +
                     $"  {ProcessArguments.ARG_MAP_NAME} {mapName}" +
-                    (!string.IsNullOrEmpty(instanceId) ?
+                    (isAllocate ? $" {ProcessArguments.ARG_ALLOCATE}" : string.Empty) +
+                    (!isAllocate && !string.IsNullOrEmpty(instanceId) ?
                         $" {ProcessArguments.ARG_INSTANCE_ID} {instanceId}" +
                         $" {ProcessArguments.ARG_INSTANCE_POSITION_X} {instanceWarpPosition.x}" +
                         $" {ProcessArguments.ARG_INSTANCE_POSITION_Y} {instanceWarpPosition.y}" +
@@ -439,6 +474,7 @@ namespace MultiplayerARPG.MMO
                             {
                                 mapName = mapName,
                                 channelId = channelId,
+                                isAllocate = isAllocate,
                             });
                         }
 
@@ -471,6 +507,7 @@ namespace MultiplayerARPG.MMO
                     {
                         mapName = mapName,
                         channelId = channelId,
+                        isAllocate = isAllocate,
                     });
                 }
 

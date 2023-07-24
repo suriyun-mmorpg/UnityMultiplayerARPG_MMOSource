@@ -2,10 +2,10 @@
 namespace MultiplayerARPG.MMO
 {
     [System.Serializable]
-    public struct InstanceMapAllocatingData
+    public struct SpawnAllocateMapData
     {
         public BaseMapInfo mapInfo;
-        public int allocatingAmount;
+        public int allocateAmount;
     }
 }
 #endif

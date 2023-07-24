@@ -1,9 +1,9 @@
 namespace MultiplayerARPG.MMO
 {
     [System.Serializable]
-    public struct InstanceMapIdAllocatingData
+    public struct SpawnAllocateMapByNameData
     {
         public string mapName;
-        public int allocatingAmount;
+        public int allocateAmount;
     }
 }

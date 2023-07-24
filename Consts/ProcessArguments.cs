@@ -43,6 +43,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_SPAWN_MAPS = "-" + CONFIG_SPAWN_MAPS;
         public const string CONFIG_SPAWN_CHANNELS = "spawnChannels";
         public const string ARG_SPAWN_CHANNELS = "-" + CONFIG_SPAWN_CHANNELS;
+        public const string CONFIG_SPAWN_ALLOCATE_MAPS = "spawnAllocateMaps";
+        public const string ARG_SPAWN_ALLOCATE_MAPS = "-" + CONFIG_SPAWN_ALLOCATE_MAPS;
         // Map server
         public const string CONFIG_MAP_PORT = "mapPort";
         public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
@@ -52,6 +54,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_CHANNEL_ID = "-" + CONFIG_CHANNEL_ID;
         public const string CONFIG_MAP_NAME = "mapName";
         public const string ARG_MAP_NAME = "-" + CONFIG_MAP_NAME;
+        public const string CONFIG_ALLOCATE = "allocate";
+        public const string ARG_ALLOCATE = "-" + CONFIG_ALLOCATE;
         public const string CONFIG_INSTANCE_ID = "instanceId";
         public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
         public const string CONFIG_INSTANCE_POSITION_X = "instancePositionX";
