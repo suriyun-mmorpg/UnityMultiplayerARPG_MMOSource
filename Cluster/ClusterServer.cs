@@ -515,11 +515,12 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public bool RequestSpawnMap(long connectionId, string sceneName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation)
+        public bool RequestSpawnMap(long connectionId, string channelId, string mapName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation)
         {
             return RequestSpawnMap(connectionId, new RequestSpawnMapMessage()
             {
-                mapName = sceneName,
+                channelId = channelId,
+                mapName = mapName,
                 instanceId = instanceId,
                 instanceWarpPosition = instanceWarpPosition,
                 instanceWarpOverrideRotation = instanceWarpOverrideRotation,
@@ -533,7 +534,7 @@ namespace MultiplayerARPG.MMO
         }
 
         /// <summary>
-        /// This is function which read request from map server to spawn another map servers
+        /// This is function which read request from map server to spawn another map server
         /// Then it will response back when requested map server is ready
         /// </summary>
         /// <param name="messageHandler"></param>
