@@ -566,6 +566,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask RequestSpawnMap(long mapSpawnConnectionId, RequestSpawnMapMessage request, string key, RequestProceedResultDelegate<ResponseSpawnMapMessage> resultForMapServer)
         {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             AsyncResponseData<ResponseSpawnMapMessage> spawnResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(mapSpawnConnectionId, MMORequestTypes.RequestSpawnMap, request, millisecondsTimeout: _centralNetworkManager.mapSpawnMillisecondsTimeout);
             if (!spawnResult.IsSuccess)
             {
@@ -574,6 +575,9 @@ namespace MultiplayerARPG.MMO
             }
             // Awaiting for the instance's connection
             _mapSpawnResultActions[key] = resultForMapServer;
+#else
+            await UniTask.Yield();
+#endif
         }
 
         /// <summary>
@@ -609,6 +613,8 @@ namespace MultiplayerARPG.MMO
             // Random map-spawn server to spawn map, will use returning ackId as reference to map-server's transport handler and ackId
             System.Random random = new System.Random(System.DateTime.Now.Millisecond);
             await RequestSpawnMap(connectionIds[random.Next(0, connectionIds.Count)], request, key, result);
+#else
+            await UniTask.Yield();
 #endif
         }
 
@@ -680,6 +686,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask<bool> ConfirmDespawnCharacter(string characterId)
         {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             if (!_connectionIdsByDespawningCharacterId.TryGetValue(characterId, out long connectionId))
             {
                 // No despawning character, so it may not played by player or already despawned
@@ -710,6 +717,9 @@ namespace MultiplayerARPG.MMO
                     Debug.LogError("Unimplemented");
                     break;
             }
+#else
+            await UniTask.Yield();
+#endif
             return false;
         }
 
