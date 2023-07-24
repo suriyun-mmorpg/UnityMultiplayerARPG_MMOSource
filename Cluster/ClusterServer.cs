@@ -259,7 +259,7 @@ namespace MultiplayerARPG.MMO
                         if (!_allocateMapServerPeersByMapId.ContainsKey(peerInfo.refId))
                             _allocateMapServerPeersByMapId.Add(peerInfo.refId, new List<CentralServerPeerInfo>());
                         _allocateMapServerPeersByMapId[peerInfo.refId].Add(peerInfo);
-                        Logging.Log(LogTag, "Register Allocate Map Server: [" + connectionId + "] [" + key + "] [" + _allocateMapServerPeersByMapId[peerInfo.refId].Count + "]");
+                        Logging.Log(LogTag, "Register Allocate Map Server: [" + connectionId + "] [" + peerInfo.refId + "] [" + _allocateMapServerPeersByMapId[peerInfo.refId].Count + "]");
                         break;
                 }
             }

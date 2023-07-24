@@ -25,6 +25,8 @@ namespace MultiplayerARPG.MMO
             public bool isAllocate;
         }
 
+        public const string ALLOCATE_CHANNEL_ID = "__ALLOC__";
+
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Central Network Connection")]
 #endif
@@ -322,7 +324,7 @@ namespace MultiplayerARPG.MMO
             {
                 for (int i = 0; i < entry.allocateAmount; ++i)
                 {
-                    SpawnMap(string.Empty, entry.mapName, true, string.Empty, Vector3.zero, false, Vector3.zero, true);
+                    SpawnMap(ALLOCATE_CHANNEL_ID, entry.mapName, true, string.Empty, Vector3.zero, false, Vector3.zero, true);
                     // Add some delay before spawn next map
 #if NET || NETCOREAPP
                     await Task.Delay(100);
