@@ -11,7 +11,6 @@ namespace MultiplayerARPG.MMO
         public Vector3 instanceWarpPosition;
         public bool instanceWarpOverrideRotation;
         public Vector3 instanceWarpRotation;
-        public string requestId;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -23,7 +22,6 @@ namespace MultiplayerARPG.MMO
                 instanceWarpPosition = reader.GetVector3();
                 instanceWarpOverrideRotation = reader.GetBool();
                 instanceWarpRotation = reader.GetVector3();
-                requestId = reader.GetString();
             }
         }
 
@@ -37,7 +35,6 @@ namespace MultiplayerARPG.MMO
                 writer.PutVector3(instanceWarpPosition);
                 writer.Put(instanceWarpOverrideRotation);
                 writer.PutVector3(instanceWarpRotation);
-                writer.Put(requestId);
             }
         }
     }

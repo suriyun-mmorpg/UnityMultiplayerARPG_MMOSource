@@ -5,21 +5,20 @@ namespace MultiplayerARPG.MMO
     public struct ResponseSpawnMapMessage : INetSerializable
     {
         public UITextKeys message;
-        public string instanceId;
-        public string requestId;
+        public CentralServerPeerInfo peerInfo;
 
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
-            instanceId = reader.GetString();
-            requestId = reader.GetString();
+            if (message == UITextKeys.NONE)
+                peerInfo = reader.Get<CentralServerPeerInfo>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
-            writer.Put(instanceId);
-            writer.Put(requestId);
+            if (message == UITextKeys.NONE)
+                writer.Put(peerInfo);
         }
     }
 }
