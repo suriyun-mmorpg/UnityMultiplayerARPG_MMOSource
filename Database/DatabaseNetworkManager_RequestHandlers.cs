@@ -263,9 +263,9 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             BuildingSaveData building = request.BuildingData;
             // Insert data to database
-            Database.CreateBuilding(request.MapName, building);
+            Database.CreateBuilding(request.ChannelId, request.MapName, building);
             // Cache building data
-            await DatabaseCache.SetBuilding(request.MapName, building);
+            await DatabaseCache.SetBuilding(request.ChannelId, request.MapName, building);
             result.InvokeSuccess(new BuildingResp()
             {
                 BuildingData = request.BuildingData
@@ -278,9 +278,9 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             BuildingSaveData building = request.BuildingData;
             // Update data to database
-            Database.UpdateBuilding(request.MapName, building);
+            Database.UpdateBuilding(request.ChannelId, request.MapName, building);
             // Cache building data
-            await DatabaseCache.SetBuilding(request.MapName, building);
+            await DatabaseCache.SetBuilding(request.ChannelId, request.MapName, building);
             result.InvokeSuccess(new BuildingResp()
             {
                 BuildingData = request.BuildingData
@@ -292,9 +292,9 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             // Remove data from cache
-            await DatabaseCache.RemoveBuilding(request.MapName, request.BuildingId);
+            await DatabaseCache.RemoveBuilding(request.ChannelId, request.MapName, request.BuildingId);
             // Remove data from database
-            Database.DeleteBuilding(request.MapName, request.BuildingId);
+            Database.DeleteBuilding(request.ChannelId, request.MapName, request.BuildingId);
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
         }
@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             result.InvokeSuccess(new BuildingsResp()
             {
-                List = await ReadBuildings(request.MapName),
+                List = await ReadBuildings(request.ChannelId, request.MapName),
             });
 #endif
         }
@@ -1237,19 +1237,19 @@ namespace MultiplayerARPG.MMO
             return foundAmount;
         }
 
-        protected async UniTask<List<BuildingSaveData>> ReadBuildings(string mapName)
+        protected async UniTask<List<BuildingSaveData>> ReadBuildings(string channel, string mapName)
         {
             if (!DisableCacheReading)
             {
                 // Get buildings from cache
-                var buildingsResult = await DatabaseCache.GetBuildings(mapName);
+                var buildingsResult = await DatabaseCache.GetBuildings(channel, mapName);
                 if (buildingsResult.HasValue)
                     return new List<BuildingSaveData>(buildingsResult.Value);
             }
             // Read buildings from database
-            List<BuildingSaveData> buildings = Database.ReadBuildings(mapName);
+            List<BuildingSaveData> buildings = Database.ReadBuildings(channel, mapName);
             // Store buildings to cache
-            await DatabaseCache.SetBuildings(mapName, buildings);
+            await DatabaseCache.SetBuildings(channel, mapName, buildings);
             return buildings;
         }
 
