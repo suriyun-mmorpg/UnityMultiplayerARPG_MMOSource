@@ -31,6 +31,10 @@ namespace MultiplayerARPG.MMO
         [Header("Map Spawn")]
 #endif
         public int mapSpawnMillisecondsTimeout = 0;
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        [Header("Channels")]
+#endif
         public int defaultChannelMaxConnections = 500;
         public List<ChannelData> channels = new List<ChannelData>();
 
