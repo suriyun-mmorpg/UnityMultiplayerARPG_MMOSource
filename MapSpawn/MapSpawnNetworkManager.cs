@@ -26,6 +26,7 @@ namespace MultiplayerARPG.MMO
             public string instanceId;
         }
 
+        public const string DEFAULT_CHANNEL_ID = "default";
         public const string ALLOCATE_CHANNEL_ID = "__ALLOC__";
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -133,7 +134,7 @@ namespace MultiplayerARPG.MMO
             useWebSocket = false;
             maxConnections = int.MaxValue;
             if (spawningChannelIds == null || spawningChannelIds.Count == 0)
-                spawningChannelIds = new List<string>() { "default" };
+                spawningChannelIds = new List<string>() { DEFAULT_CHANNEL_ID };
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;

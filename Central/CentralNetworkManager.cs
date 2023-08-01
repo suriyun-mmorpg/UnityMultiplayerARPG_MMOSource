@@ -15,6 +15,7 @@ namespace MultiplayerARPG.MMO
 #endif
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
+        public const string DEFAULT_CHANNEL_ID = "default";
         protected static readonly NetDataWriter s_Writer = new NetDataWriter();
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
@@ -90,9 +91,9 @@ namespace MultiplayerARPG.MMO
                     }
                     if (_channels.Count == 0)
                     {
-                        _channels["default"] = new ChannelData()
+                        _channels[DEFAULT_CHANNEL_ID] = new ChannelData()
                         {
-                            id = "default",
+                            id = DEFAULT_CHANNEL_ID,
                             title = "Default",
                             maxConnections = defaultChannelMaxConnections,
                         };
