@@ -48,7 +48,6 @@
         public const ushort RequestGetGuildGold = 44;
         public const ushort RequestChangeGuildGold = 45;
         public const ushort RequestReadStorageItems = 46;
-        public const ushort RequestUpdateStorageItems = 47;
         public const ushort RequestMailList = 52;
         public const ushort RequestUpdateReadMailState = 53;
         public const ushort RequestUpdateClaimMailItemsState = 54;
@@ -67,7 +66,6 @@
         public const ushort RequestSetUserUnbanTimeByCharacterName = 71;
         public const ushort RequestSetCharacterUnmuteTimeByName = 72;
         public const ushort RequestGetSummonBuffs = 73;
-        public const ushort RequestSetSummonBuffs = 74;
         public const ushort RequestValidateEmailVerification = 75;
         public const ushort RequestFindEmail = 76;
         public const ushort RequestGetFriendRequestNotification = 77;

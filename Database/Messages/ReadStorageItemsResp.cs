@@ -6,12 +6,12 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
-            StorageCharacterItems = reader.GetList<CharacterItem>();
+            StorageItems = reader.GetList<CharacterItem>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutList(StorageCharacterItems);
+            writer.PutList(StorageItems);
         }
     }
 }

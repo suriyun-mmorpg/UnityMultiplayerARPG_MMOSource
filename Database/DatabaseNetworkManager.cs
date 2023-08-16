@@ -141,7 +141,6 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, GetGuildGold);
             RegisterRequestToServer<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, ChangeGuildGold);
             RegisterRequestToServer<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, ReadStorageItems);
-            RegisterRequestToServer<UpdateStorageItemsReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateStorageItems, UpdateStorageItems);
             RegisterRequestToServer<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, MailList);
             RegisterRequestToServer<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, UpdateReadMailState);
             RegisterRequestToServer<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, UpdateClaimMailItemsState);
@@ -155,7 +154,6 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetUserUnbanTimeByCharacterName, SetUserUnbanTimeByCharacterName);
             RegisterRequestToServer<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, SetCharacterUnmuteTimeByName);
             RegisterRequestToServer<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.RequestGetSummonBuffs, GetSummonBuffs);
-            RegisterRequestToServer<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, SetSummonBuffs);
             RegisterRequestToServer<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, FindEmail);
             RegisterRequestToServer<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, ValidateEmailVerification);
             RegisterRequestToServer<UpdateUserCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateUserCount, UpdateUserCount);

@@ -319,11 +319,6 @@ namespace MultiplayerARPG.MMO
             return await SendRequest<ReadStorageItemsReq, ReadStorageItemsResp>(request, GetUrl(apiUrl, DatabaseApiPath.ReadStorageItems), nameof(ReadStorageItemsAsync));
         }
 
-        public async UniTask<DatabaseApiResult> UpdateStorageItemsAsync(UpdateStorageItemsReq request)
-        {
-            return await SendRequest(request, GetUrl(apiUrl, DatabaseApiPath.UpdateStorageItems), nameof(UpdateStorageItemsAsync));
-        }
-
         public async UniTask<DatabaseApiResult<MailListResp>> MailListAsync(MailListReq request)
         {
             return await SendRequest<MailListReq, MailListResp>(request, GetUrl(apiUrl, DatabaseApiPath.MailList), nameof(MailListAsync));
@@ -387,11 +382,6 @@ namespace MultiplayerARPG.MMO
         public async UniTask<DatabaseApiResult<GetSummonBuffsResp>> GetSummonBuffsAsync(GetSummonBuffsReq request)
         {
             return await SendRequest<GetSummonBuffsReq, GetSummonBuffsResp>(request, GetUrl(apiUrl, DatabaseApiPath.GetSummonBuffs), nameof(GetSummonBuffsAsync));
-        }
-
-        public async UniTask<DatabaseApiResult> SetSummonBuffsAsync(SetSummonBuffsReq request)
-        {
-            return await SendRequest(request, GetUrl(apiUrl, DatabaseApiPath.SetSummonBuffs), nameof(SetSummonBuffsAsync));
         }
 
         public async UniTask<DatabaseApiResult<ValidateEmailVerificationResp>> ValidateEmailVerificationAsync(ValidateEmailVerificationReq request)
