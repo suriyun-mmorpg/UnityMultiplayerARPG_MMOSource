@@ -135,13 +135,18 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             PlayerCharacterData character = request.CharacterData;
+            long foundAmount = await FindCharacterName(character.CharacterName);
+            if (foundAmount > 0)
+            {
+                result.InvokeError(new CharacterResp());
+                return;
+            }
             // Insert new character to database
             Database.CreateCharacter(request.UserId, character);
             result.InvokeSuccess(new CharacterResp()
             {
                 CharacterData = character
             });
-            await UniTask.Yield();
 #endif
         }
 
@@ -223,7 +228,6 @@ namespace MultiplayerARPG.MMO
             {
                 List = await Database.FindCharacters(request.FinderId, request.CharacterName, request.Skip, request.Limit)
             });
-            await UniTask.Yield();
 #endif
         }
 
@@ -377,7 +381,6 @@ namespace MultiplayerARPG.MMO
             // Remove data from database
             Database.DeleteParty(request.PartyId);
             result.InvokeSuccess(EmptyMessage.Value);
-            await UniTask.Yield();
 #endif
         }
 
@@ -447,6 +450,12 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid CreateGuild(RequestHandlerData requestHandler, CreateGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            long foundAmount = await FindGuildName(request.GuildName);
+            if (foundAmount > 0)
+            {
+                result.InvokeError(new GuildResp());
+                return;
+            }
             // Insert to database
             int guildId = await Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
             GuildData guild = new GuildData(guildId, request.GuildName, request.LeaderCharacterId, GuildMemberRoles);
@@ -455,7 +464,6 @@ namespace MultiplayerARPG.MMO
             {
                 GuildData = guild
             });
-            await UniTask.Yield();
 #endif
         }
 
