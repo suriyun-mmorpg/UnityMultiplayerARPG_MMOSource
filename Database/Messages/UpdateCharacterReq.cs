@@ -7,21 +7,22 @@ namespace MultiplayerARPG.MMO
         public void Deserialize(NetDataReader reader)
         {
             CharacterData = reader.Get(() => new PlayerCharacterData());
-            ExtraContent = (EExtraContent)reader.GetByte();
-            if (HasExtraContent(EExtraContent.StorageItems))
+            SummonBuffs = reader.GetList<CharacterBuff>();
+            bool isNull = reader.GetBool();
+            if (!isNull)
                 StorageItems = reader.GetList<CharacterItem>();
-            if (HasExtraContent(EExtraContent.SummonBuffs))
-                SummonBuffs = reader.GetList<CharacterBuff>();
+            else
+                StorageItems = null;
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(CharacterData);
-            writer.Put((byte)ExtraContent);
-            if (HasExtraContent(EExtraContent.StorageItems))
+            writer.PutList(SummonBuffs);
+            bool isNull = StorageItems == null;
+            writer.Put(isNull);
+            if (!isNull)
                 writer.PutList(StorageItems);
-            if (HasExtraContent(EExtraContent.SummonBuffs))
-                writer.PutList(SummonBuffs);
         }
     }
 }

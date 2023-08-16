@@ -184,19 +184,12 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
-                Database.UpdateCharacter(request.CharacterData),
-                DatabaseCache.SetPlayerCharacter(request.CharacterData)
+                Database.UpdateCharacter(request.CharacterData, request.SummonBuffs, request.StorageItems),
+                DatabaseCache.SetPlayerCharacter(request.CharacterData),
+                DatabaseCache.SetSummonBuffs(request.CharacterData.Id, request.SummonBuffs),
             };
-            if (request.HasExtraContent(UpdateCharacterReq.EExtraContent.StorageItems))
-            {
-                tasks.Add(Database.UpdateStorageItems(StorageType.Player, request.CharacterData.UserId, request.StorageItems));
+            if (request.StorageItems != null)
                 tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.StorageItems));
-            }
-            if (request.HasExtraContent(UpdateCharacterReq.EExtraContent.SummonBuffs))
-            {
-                tasks.Add(Database.UpdateSummonBuffs(request.CharacterData.Id, request.SummonBuffs));
-                tasks.Add(DatabaseCache.SetSummonBuffs(request.CharacterData.Id, request.SummonBuffs));
-            }
             await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new CharacterResp()
             {
@@ -288,14 +281,11 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
-                Database.UpdateBuilding(request.ChannelId, request.MapName, request.BuildingData),
+                Database.UpdateBuilding(request.ChannelId, request.MapName, request.BuildingData, request.StorageItems),
                 DatabaseCache.SetBuilding(request.ChannelId, request.MapName, request.BuildingData)
             };
-            if (request.HasExtraContent(UpdateBuildingReq.EExtraContent.StorageItems))
-            {
-                tasks.Add(Database.UpdateStorageItems(StorageType.Building, request.BuildingData.Id, request.StorageItems));
+            if (request.StorageItems != null)
                 tasks.Add(DatabaseCache.SetStorageItems(StorageType.Building, request.BuildingData.Id, request.StorageItems));
-            }
             await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new BuildingResp()
             {
