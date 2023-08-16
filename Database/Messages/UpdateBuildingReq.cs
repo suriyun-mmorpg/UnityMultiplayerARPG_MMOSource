@@ -9,6 +9,9 @@ namespace MultiplayerARPG.MMO
             ChannelId = reader.GetString();
             MapName = reader.GetString();
             BuildingData = reader.Get(() => new BuildingSaveData());
+            ExtraContent = (EExtraContent)reader.GetByte();
+            if (HasExtraContent(EExtraContent.StorageItems))
+                StorageItems = reader.GetList<CharacterItem>();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -16,6 +19,9 @@ namespace MultiplayerARPG.MMO
             writer.Put(ChannelId);
             writer.Put(MapName);
             writer.Put(BuildingData);
+            writer.Put((byte)ExtraContent);
+            if (HasExtraContent(EExtraContent.StorageItems))
+                writer.PutList(StorageItems);
         }
     }
 }
