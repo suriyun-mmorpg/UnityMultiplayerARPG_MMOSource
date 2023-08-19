@@ -765,12 +765,12 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid DeleteGuild(RequestHandlerData requestHandler, DeleteGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // Remove data from cache
             GuildData guild = await ReadGuild(request.GuildId);
             if (!DisableDatabaseCaching)
             {
                 if (guild != null)
                 {
+                    // Remove data from cache
                     await UniTask.WhenAll(
                         DatabaseCache.RemoveGuildName(guild.guildName),
                         DatabaseCache.RemoveGuild(guild.id));
