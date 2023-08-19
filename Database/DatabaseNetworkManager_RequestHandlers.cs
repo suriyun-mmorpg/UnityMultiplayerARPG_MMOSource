@@ -867,7 +867,6 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid IncreaseGuildExp(RequestHandlerData requestHandler, IncreaseGuildExpReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // TODO: May validate guild by character
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -895,7 +894,6 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid AddGuildSkill(RequestHandlerData requestHandler, AddGuildSkillReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // TODO: May validate guild by character
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
