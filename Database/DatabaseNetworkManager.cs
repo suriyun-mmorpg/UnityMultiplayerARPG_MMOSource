@@ -2,6 +2,7 @@
 using LiteNetLibManager;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using UnityEngine;
+using UnityEngine.Serialization;
 #endif
 
 namespace MultiplayerARPG.MMO
@@ -21,8 +22,9 @@ namespace MultiplayerARPG.MMO
         private BaseDatabase[] databaseOptions = new BaseDatabase[0];
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [SerializeField]
+        [FormerlySerializedAs("disableCacheReading")]
 #endif
-        private bool disableCacheReading = false;
+        private bool disableDatabaseCaching = false;
 
         public BaseDatabase Database
         {
@@ -36,10 +38,10 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public bool DisableCacheReading
+        public bool DisableDatabaseCaching
         {
-            get { return disableCacheReading; }
-            set { disableCacheReading = value; }
+            get { return disableDatabaseCaching; }
+            set { disableDatabaseCaching = value; }
         }
 
         public IDatabaseCache DatabaseCache

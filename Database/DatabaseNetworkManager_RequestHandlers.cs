@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using System;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
@@ -62,8 +61,11 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             int gold = await ReadGold(request.UserId);
             gold += request.ChangeAmount;
-            // Cache the data, it will be used later
-            await DatabaseCache.SetUserGold(request.UserId, gold);
+            if (!DisableDatabaseCaching)
+            {
+                // Cache the data, it will be used later
+                await DatabaseCache.SetUserGold(request.UserId, gold);
+            }
             // Update data to database
             await Database.UpdateGold(request.UserId, gold);
             result.InvokeSuccess(new GoldResp()
@@ -88,8 +90,11 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             int cash = await ReadCash(request.UserId);
             cash += request.ChangeAmount;
-            // Cache the data, it will be used later
-            await DatabaseCache.SetUserCash(request.UserId, cash);
+            if (!DisableDatabaseCaching)
+            {
+                // Cache the data, it will be used later
+                await DatabaseCache.SetUserCash(request.UserId, cash);
+            }
             // Update data to database
             await Database.UpdateCash(request.UserId, cash);
             result.InvokeSuccess(new CashResp()
@@ -102,8 +107,11 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid UpdateAccessToken(RequestHandlerData requestHandler, UpdateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // Store access token to the dictionary, it will be used to validate later
-            await DatabaseCache.SetUserAccessToken(request.UserId, request.AccessToken);
+            if (!DisableDatabaseCaching)
+            {
+                // Store access token to the dictionary, it will be used to validate later
+                await DatabaseCache.SetUserAccessToken(request.UserId, request.AccessToken);
+            }
             // Update data to database
             await Database.UpdateAccessToken(request.UserId, request.AccessToken);
             result.InvokeSuccess(EmptyMessage.Value);
@@ -113,8 +121,11 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid CreateUserLogin(RequestHandlerData requestHandler, CreateUserLoginReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // Cache username, it will be used to validate later
-            await DatabaseCache.AddUsername(request.Username);
+            if (!DisableDatabaseCaching)
+            {
+                // Cache username, it will be used to validate later
+                await DatabaseCache.AddUsername(request.Username);
+            }
             // Insert new user login to database
             await Database.CreateUserLogin(request.Username, request.Password, request.Email);
             result.InvokeSuccess(EmptyMessage.Value);
@@ -185,11 +196,14 @@ namespace MultiplayerARPG.MMO
             List<UniTask> tasks = new List<UniTask>
             {
                 Database.UpdateCharacter(request.CharacterData, request.SummonBuffs, request.StorageItems),
-                DatabaseCache.SetPlayerCharacter(request.CharacterData),
-                DatabaseCache.SetSummonBuffs(request.CharacterData.Id, request.SummonBuffs),
             };
-            if (request.StorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.StorageItems));
+            if (!DisableDatabaseCaching)
+            {
+                tasks.Add(DatabaseCache.SetPlayerCharacter(request.CharacterData));
+                tasks.Add(DatabaseCache.SetSummonBuffs(request.CharacterData.Id, request.SummonBuffs));
+                if (request.StorageItems != null)
+                    tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.StorageItems));
+            }
             await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new CharacterResp()
             {
@@ -202,12 +216,16 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             // Remove data from cache
-            var playerCharacter = await ReadCharacter(request.CharacterId);
-            if (playerCharacter != null)
+            PlayerCharacterData playerCharacter = await ReadCharacter(request.CharacterId);
+            if (!DisableDatabaseCaching)
             {
-                await DatabaseCache.RemoveCharacterName(playerCharacter.CharacterName);
-                await DatabaseCache.RemovePlayerCharacter(playerCharacter.Id);
-                await DatabaseCache.RemoveSocialCharacter(playerCharacter.Id);
+                if (playerCharacter != null)
+                {
+                    await UniTask.WhenAll(
+                        DatabaseCache.RemoveCharacterName(playerCharacter.CharacterName),
+                        DatabaseCache.RemovePlayerCharacter(playerCharacter.Id),
+                        DatabaseCache.RemoveSocialCharacter(playerCharacter.Id));
+                }
             }
             // Delete data from database
             await Database.DeleteCharacter(request.UserId, request.CharacterId);
@@ -267,8 +285,11 @@ namespace MultiplayerARPG.MMO
             BuildingSaveData building = request.BuildingData;
             // Insert data to database
             await Database.CreateBuilding(request.ChannelId, request.MapName, building);
-            // Cache building data
-            await DatabaseCache.SetBuilding(request.ChannelId, request.MapName, building);
+            if (!DisableDatabaseCaching)
+            {
+                // Cache building data
+                await DatabaseCache.SetBuilding(request.ChannelId, request.MapName, building);
+            }
             result.InvokeSuccess(new BuildingResp()
             {
                 BuildingData = request.BuildingData
@@ -282,10 +303,13 @@ namespace MultiplayerARPG.MMO
             List<UniTask> tasks = new List<UniTask>
             {
                 Database.UpdateBuilding(request.ChannelId, request.MapName, request.BuildingData, request.StorageItems),
-                DatabaseCache.SetBuilding(request.ChannelId, request.MapName, request.BuildingData)
             };
-            if (request.StorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Building, request.BuildingData.Id, request.StorageItems));
+            if (!DisableDatabaseCaching)
+            {
+                tasks.Add(DatabaseCache.SetBuilding(request.ChannelId, request.MapName, request.BuildingData));
+                if (request.StorageItems != null)
+                    tasks.Add(DatabaseCache.SetStorageItems(StorageType.Building, request.BuildingData.Id, request.StorageItems));
+            }
             await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new BuildingResp()
             {
@@ -297,8 +321,11 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid DeleteBuilding(RequestHandlerData requestHandler, DeleteBuildingReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // Remove data from cache
-            await DatabaseCache.RemoveBuilding(request.ChannelId, request.MapName, request.BuildingId);
+            if (!DisableDatabaseCaching)
+            {
+                // Remove data from cache
+                await DatabaseCache.RemoveBuilding(request.ChannelId, request.MapName, request.BuildingId);
+            }
             // Remove data from database
             await Database.DeleteBuilding(request.ChannelId, request.MapName, request.BuildingId);
             result.InvokeSuccess(EmptyMessage.Value);
@@ -321,8 +348,11 @@ namespace MultiplayerARPG.MMO
             // Insert to database
             int partyId = await Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId);
             PartyData party = new PartyData(partyId, request.ShareExp, request.ShareItem, request.LeaderCharacterId);
-            // Cache the data, it will be used later
-            await DatabaseCache.SetParty(party);
+            if (!DisableDatabaseCaching)
+            {
+                // Cache the data, it will be used later
+                await DatabaseCache.SetParty(party);
+            }
             result.InvokeSuccess(new PartyResp()
             {
                 PartyData = party
@@ -343,8 +373,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             party.Setting(request.ShareExp, request.ShareItem);
-            // Update to cache
-            await DatabaseCache.SetParty(party);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetParty(party);
+            }
             // Update to database
             await Database.UpdateParty(request.PartyId, request.ShareExp, request.ShareItem);
             result.InvokeSuccess(new PartyResp()
@@ -367,8 +400,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             party.SetLeader(request.LeaderCharacterId);
-            // Update to cache
-            await DatabaseCache.SetParty(party);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetParty(party);
+            }
             // Update to database
             await Database.UpdatePartyLeader(request.PartyId, request.LeaderCharacterId);
             result.InvokeSuccess(new PartyResp()
@@ -381,8 +417,11 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid DeleteParty(RequestHandlerData requestHandler, DeletePartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            // Remove data from cache
-            await DatabaseCache.RemoveParty(request.PartyId);
+            if (!DisableDatabaseCaching)
+            {
+                // Remove data from cache
+                await DatabaseCache.RemoveParty(request.PartyId);
+            }
             // Remove data from database
             await Database.DeleteParty(request.PartyId);
             result.InvokeSuccess(EmptyMessage.Value);
@@ -403,10 +442,14 @@ namespace MultiplayerARPG.MMO
             }
             SocialCharacterData character = request.SocialCharacterData;
             party.AddMember(character);
-            // Update to cache
-            await DatabaseCache.SetParty(party);
-            await DatabaseCache.SetPlayerCharacterPartyId(character.id, party.id);
-            await DatabaseCache.SetSocialCharacterPartyId(character.id, party.id);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await UniTask.WhenAll(
+                    DatabaseCache.SetParty(party),
+                    DatabaseCache.SetPlayerCharacterPartyId(character.id, party.id),
+                    DatabaseCache.SetSocialCharacterPartyId(character.id, party.id));
+            }
             // Update to database
             await Database.UpdateCharacterParty(character.id, request.PartyId);
             result.InvokeSuccess(new PartyResp()
@@ -432,10 +475,14 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             party.RemoveMember(request.CharacterId);
-            // Update to cache
-            await DatabaseCache.SetParty(party);
-            await DatabaseCache.SetPlayerCharacterPartyId(request.CharacterId, 0);
-            await DatabaseCache.SetSocialCharacterPartyId(request.CharacterId, 0);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await UniTask.WhenAll(
+                    DatabaseCache.SetParty(party),
+                    DatabaseCache.SetPlayerCharacterPartyId(request.CharacterId, 0),
+                    DatabaseCache.SetSocialCharacterPartyId(request.CharacterId, 0));
+            }
             // Update to database
             await Database.UpdateCharacterParty(request.CharacterId, 0);
             result.InvokeSuccess(EmptyMessage.Value);
@@ -485,8 +532,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.SetLeader(request.LeaderCharacterId);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildLeader(request.GuildId, request.LeaderCharacterId);
             result.InvokeSuccess(new GuildResp()
@@ -509,8 +559,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.guildMessage = request.GuildMessage;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildMessage(request.GuildId, request.GuildMessage);
             result.InvokeSuccess(new GuildResp()
@@ -533,8 +586,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.guildMessage2 = request.GuildMessage;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildMessage2(request.GuildId, request.GuildMessage);
             result.InvokeSuccess(new GuildResp()
@@ -557,8 +613,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.score = request.Score;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildScore(request.GuildId, request.Score);
             result.InvokeSuccess(new GuildResp()
@@ -581,8 +640,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.options = request.Options;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildOptions(request.GuildId, request.Options);
             result.InvokeSuccess(new GuildResp()
@@ -605,8 +667,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.autoAcceptRequests = request.AutoAcceptRequests;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildAutoAcceptRequests(request.GuildId, request.AutoAcceptRequests);
             result.InvokeSuccess(new GuildResp()
@@ -629,8 +694,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.score = request.Rank;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildRank(request.GuildId, request.Rank);
             result.InvokeSuccess(new GuildResp()
@@ -653,8 +721,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.SetRole(request.GuildRole, request.GuildRoleData);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildRole(request.GuildId, request.GuildRole, request.GuildRoleData);
             result.InvokeSuccess(new GuildResp()
@@ -677,8 +748,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.SetMemberRole(request.MemberCharacterId, request.GuildRole);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildMemberRole(request.MemberCharacterId, request.GuildRole);
             result.InvokeSuccess(new GuildResp()
@@ -692,11 +766,15 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             // Remove data from cache
-            var guild = await ReadGuild(request.GuildId);
-            if (guild != null)
+            GuildData guild = await ReadGuild(request.GuildId);
+            if (!DisableDatabaseCaching)
             {
-                await DatabaseCache.RemoveGuildName(guild.guildName);
-                await DatabaseCache.RemoveGuild(guild.id);
+                if (guild != null)
+                {
+                    await UniTask.WhenAll(
+                        DatabaseCache.RemoveGuildName(guild.guildName),
+                        DatabaseCache.RemoveGuild(guild.id));
+                }
             }
             // Remove data from database
             await Database.DeleteGuild(request.GuildId);
@@ -718,10 +796,14 @@ namespace MultiplayerARPG.MMO
             }
             SocialCharacterData character = request.SocialCharacterData;
             guild.AddMember(character, request.GuildRole);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
-            await DatabaseCache.SetPlayerCharacterGuildIdAndRole(character.id, guild.id, request.GuildRole);
-            await DatabaseCache.SetSocialCharacterGuildIdAndRole(character.id, guild.id, request.GuildRole);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await UniTask.WhenAll(
+                    DatabaseCache.SetGuild(guild),
+                    DatabaseCache.SetPlayerCharacterGuildIdAndRole(character.id, guild.id, request.GuildRole),
+                    DatabaseCache.SetSocialCharacterGuildIdAndRole(character.id, guild.id, request.GuildRole));
+            }
             // Update to database
             await Database.UpdateCharacterGuild(character.id, request.GuildId, request.GuildRole);
             result.InvokeSuccess(new GuildResp()
@@ -748,10 +830,14 @@ namespace MultiplayerARPG.MMO
             }
             // Update to cache
             guild.RemoveMember(request.CharacterId);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
-            await DatabaseCache.SetPlayerCharacterGuildIdAndRole(request.CharacterId, 0, 0);
-            await DatabaseCache.SetSocialCharacterGuildIdAndRole(request.CharacterId, 0, 0);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await UniTask.WhenAll(
+                    DatabaseCache.SetGuild(guild),
+                    DatabaseCache.SetPlayerCharacterGuildIdAndRole(request.CharacterId, 0, 0),
+                    DatabaseCache.SetSocialCharacterGuildIdAndRole(request.CharacterId, 0, 0));
+            }
             // Update to database
             await Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
             result.InvokeSuccess(EmptyMessage.Value);
@@ -792,8 +878,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.IncreaseGuildExp(GuildExpTree, request.Exp);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
             result.InvokeSuccess(new GuildResp()
@@ -817,8 +906,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.AddSkillLevel(request.SkillId);
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
             result.InvokeSuccess(new GuildResp()
@@ -860,8 +952,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.gold += request.ChangeAmount;
-            // Update to cache
-            await DatabaseCache.SetGuild(guild);
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetGuild(guild);
+            }
             // Update to database
             await Database.UpdateGuildGold(request.GuildId, guild.gold);
             result.InvokeSuccess(new GuildGoldResp()
@@ -1089,7 +1184,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Already cached access token, so validate access token from cache
                 var accessTokenResult = await DatabaseCache.GetUserAccessToken(userId);
@@ -1098,8 +1193,11 @@ namespace MultiplayerARPG.MMO
             // Doesn't cached yet, so try validate from database
             if (await Database.ValidateAccessToken(userId, accessToken))
             {
-                // Pass, store access token to the dictionary
-                await DatabaseCache.SetUserAccessToken(userId, accessToken);
+                if (!DisableDatabaseCaching)
+                {
+                    // Pass, store access token to the dictionary
+                    await DatabaseCache.SetUserAccessToken(userId, accessToken);
+                }
                 return true;
             }
             return false;
@@ -1108,7 +1206,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTask<long> FindUsername(string username)
         {
             long foundAmount;
-            if (!DisableCacheReading && await DatabaseCache.ContainsUsername(username))
+            if (!DisableDatabaseCaching && await DatabaseCache.ContainsUsername(username))
             {
                 // Already cached username, so validate username from cache
                 foundAmount = 1;
@@ -1118,7 +1216,7 @@ namespace MultiplayerARPG.MMO
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindUsername(username);
                 // Cache username, it will be used to validate later
-                if (foundAmount > 0)
+                if (!DisableDatabaseCaching && foundAmount > 0)
                     await DatabaseCache.AddUsername(username);
             }
             return foundAmount;
@@ -1127,7 +1225,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTask<long> FindCharacterName(string characterName)
         {
             long foundAmount;
-            if (!DisableCacheReading && await DatabaseCache.ContainsCharacterName(characterName))
+            if (!DisableDatabaseCaching && await DatabaseCache.ContainsCharacterName(characterName))
             {
                 // Already cached character name, so validate character name from cache
                 foundAmount = 1;
@@ -1137,7 +1235,7 @@ namespace MultiplayerARPG.MMO
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindCharacterName(characterName);
                 // Cache character name, it will be used to validate later
-                if (foundAmount > 0)
+                if (!DisableDatabaseCaching && foundAmount > 0)
                     await DatabaseCache.AddCharacterName(characterName);
             }
             return foundAmount;
@@ -1146,7 +1244,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTask<long> FindGuildName(string guildName)
         {
             long foundAmount;
-            if (!DisableCacheReading && await DatabaseCache.ContainsGuildName(guildName))
+            if (!DisableDatabaseCaching && await DatabaseCache.ContainsGuildName(guildName))
             {
                 // Already cached username, so validate username from cache
                 foundAmount = 1;
@@ -1156,7 +1254,7 @@ namespace MultiplayerARPG.MMO
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindGuildName(guildName);
                 // Cache guild name, it will be used to validate later
-                if (foundAmount > 0)
+                if (!DisableDatabaseCaching && foundAmount > 0)
                     await DatabaseCache.AddGuildName(guildName);
             }
             return foundAmount;
@@ -1165,7 +1263,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTask<long> FindEmail(string email)
         {
             long foundAmount;
-            if (!DisableCacheReading && await DatabaseCache.ContainsEmail(email))
+            if (!DisableDatabaseCaching && await DatabaseCache.ContainsEmail(email))
             {
                 // Already cached username, so validate username from cache
                 foundAmount = 1;
@@ -1175,7 +1273,7 @@ namespace MultiplayerARPG.MMO
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindEmail(email);
                 // Cache username, it will be used to validate later
-                if (foundAmount > 0)
+                if (!DisableDatabaseCaching && foundAmount > 0)
                     await DatabaseCache.AddEmail(email);
             }
             return foundAmount;
@@ -1183,7 +1281,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTask<List<BuildingSaveData>> ReadBuildings(string channel, string mapName)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get buildings from cache
                 var buildingsResult = await DatabaseCache.GetBuildings(channel, mapName);
@@ -1192,14 +1290,17 @@ namespace MultiplayerARPG.MMO
             }
             // Read buildings from database
             List<BuildingSaveData> buildings = await Database.ReadBuildings(channel, mapName);
-            // Store buildings to cache
-            await DatabaseCache.SetBuildings(channel, mapName, buildings);
+            if (!DisableDatabaseCaching)
+            {
+                // Store buildings to cache
+                await DatabaseCache.SetBuildings(channel, mapName, buildings);
+            }
             return buildings;
         }
 
         protected async UniTask<int> ReadGold(string userId)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get gold from cache
                 var goldResult = await DatabaseCache.GetUserGold(userId);
@@ -1208,14 +1309,17 @@ namespace MultiplayerARPG.MMO
             }
             // Read gold from database
             int gold = await Database.GetGold(userId);
-            // Store gold to cache
-            await DatabaseCache.SetUserGold(userId, gold);
+            if (!DisableDatabaseCaching)
+            {
+                // Store gold to cache
+                await DatabaseCache.SetUserGold(userId, gold);
+            }
             return gold;
         }
 
         protected async UniTask<int> ReadCash(string userId)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get cash from cache
                 var cashResult = await DatabaseCache.GetUserCash(userId);
@@ -1224,14 +1328,17 @@ namespace MultiplayerARPG.MMO
             }
             // Read cash from database
             int cash = await Database.GetCash(userId);
-            // Store cash to cache
-            await DatabaseCache.SetUserCash(userId, cash);
+            if (!DisableDatabaseCaching)
+            {
+                // Store cash to cache
+                await DatabaseCache.SetUserCash(userId, cash);
+            }
             return cash;
         }
 
         protected async UniTask<PlayerCharacterData> ReadCharacter(string id)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get character from cache
                 var characterResult = await DatabaseCache.GetPlayerCharacter(id);
@@ -1240,10 +1347,13 @@ namespace MultiplayerARPG.MMO
             }
             // Read character from database
             PlayerCharacterData character = await Database.ReadCharacter(id);
-            if (character != null)
+            if (!DisableDatabaseCaching)
             {
-                // Store character to cache
-                await DatabaseCache.SetPlayerCharacter(character);
+                if (character != null)
+                {
+                    // Store character to cache
+                    await DatabaseCache.SetPlayerCharacter(character);
+                }
             }
             return character;
         }
@@ -1258,7 +1368,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTask<SocialCharacterData> ReadSocialCharacter(string id)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get character from cache
                 var characterResult = await DatabaseCache.GetSocialCharacter(id);
@@ -1267,14 +1377,17 @@ namespace MultiplayerARPG.MMO
             }
             // Read character from database
             SocialCharacterData character = SocialCharacterData.Create(await Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false, false));
-            // Store character to cache
-            await DatabaseCache.SetSocialCharacter(character);
+            if (!DisableDatabaseCaching)
+            {
+                // Store character to cache
+                await DatabaseCache.SetSocialCharacter(character);
+            }
             return character;
         }
 
         protected async UniTask<PartyData> ReadParty(int id)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get party from cache
                 var partyResult = await DatabaseCache.GetParty(id);
@@ -1283,18 +1396,22 @@ namespace MultiplayerARPG.MMO
             }
             // Read party from database
             PartyData party = await Database.ReadParty(id);
-            if (party != null)
+            if (!DisableDatabaseCaching)
             {
-                // Store party to cache
-                await DatabaseCache.SetParty(party);
-                await CacheSocialCharacters(party.GetMembers());
+                if (party != null)
+                {
+                    // Store party to cache
+                    await UniTask.WhenAll(
+                        DatabaseCache.SetParty(party),
+                        CacheSocialCharacters(party.GetMembers()));
+                }
             }
             return party;
         }
 
         protected async UniTask<GuildData> ReadGuild(int id)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get guild from cache
                 var guildResult = await DatabaseCache.GetGuild(id);
@@ -1303,18 +1420,22 @@ namespace MultiplayerARPG.MMO
             }
             // Read guild from database
             GuildData guild = await Database.ReadGuild(id, GuildMemberRoles);
-            if (guild != null)
+            if (!DisableDatabaseCaching)
             {
-                // Store guild to cache
-                await DatabaseCache.SetGuild(guild);
-                await CacheSocialCharacters(guild.GetMembers());
+                if (guild != null)
+                {
+                    // Store guild to cache
+                    await UniTask.WhenAll(
+                        DatabaseCache.SetGuild(guild),
+                        CacheSocialCharacters(guild.GetMembers()));
+                }
             }
             return guild;
         }
 
         protected async UniTask<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
-            if (!DisableCacheReading)
+            if (!DisableDatabaseCaching)
             {
                 // Get storageItems from cache
                 var storageItemsResult = await DatabaseCache.GetStorageItems(storageType, storageOwnerId);
@@ -1323,13 +1444,18 @@ namespace MultiplayerARPG.MMO
             }
             // Read storageItems from database
             List<CharacterItem> storageItems = await Database.ReadStorageItems(storageType, storageOwnerId);
-            // Store storageItems to cache
-            await DatabaseCache.SetStorageItems(storageType, storageOwnerId, storageItems);
+            if (!DisableDatabaseCaching)
+            {
+                // Store storageItems to cache
+                await DatabaseCache.SetStorageItems(storageType, storageOwnerId, storageItems);
+            }
             return storageItems;
         }
 
         protected async UniTask CacheSocialCharacters(SocialCharacterData[] socialCharacters)
         {
+            if (DisableDatabaseCaching)
+                return;
             UniTask<bool>[] tasks = new UniTask<bool>[socialCharacters.Length];
             for (int i = 0; i < socialCharacters.Length; ++i)
             {
