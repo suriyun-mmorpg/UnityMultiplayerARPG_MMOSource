@@ -967,10 +967,49 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ReadStorageItems(RequestHandlerData requestHandler, ReadStorageItemsReq request, RequestProceedResultDelegate<ReadStorageItemsResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            if (request.StorageType == StorageType.Guild)
+            {
+                if (await Database.FindReservedStorage(request.StorageType, request.StorageOwnerId) > 0)
+                {
+                    result.InvokeError(new ReadStorageItemsResp()
+                    {
+                        Error = UITextKeys.UI_ERROR_OTHER_GUILD_MEMBER_ACCESSING_STORAGE,
+                    });
+                    return;
+                }
+                await Database.UpdateReservedStorage(request.StorageType, request.StorageOwnerId, request.ReserverId);
+            }
             result.InvokeSuccess(new ReadStorageItemsResp()
             {
                 StorageItems = await ReadStorageItems(request.StorageType, request.StorageOwnerId),
             });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateStorageItems(RequestHandlerData requestHandler, UpdateStorageItemsReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            if (request.StorageType == StorageType.Guild)
+            {
+                // Delete reserver
+                await Database.DeleteReservedStorage(request.StorageType, request.StorageOwnerId);
+            }
+            if (!DisableDatabaseCaching)
+            {
+                // Update to cache
+                await DatabaseCache.SetStorageItems(request.StorageType, request.StorageOwnerId, request.StorageItems);
+            }
+            // Update to database
+            await Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, request.StorageItems);
+            result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
+        protected async UniTaskVoid DeleteAllReservedStorage(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            await Database.DeleteAllReservedStorage();
+            result.InvokeSuccess(EmptyMessage.Value);
 #endif
         }
 

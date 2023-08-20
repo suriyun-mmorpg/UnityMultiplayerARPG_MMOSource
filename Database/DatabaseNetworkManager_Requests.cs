@@ -286,6 +286,16 @@ namespace MultiplayerARPG.MMO
             return await SendRequest<ReadStorageItemsReq, ReadStorageItemsResp>(request, DatabaseRequestTypes.RequestReadStorageItems, nameof(ReadStorageItemsAsync));
         }
 
+        public async UniTask<DatabaseApiResult> UpdateStorageItemsAsync(UpdateStorageItemsReq request)
+        {
+            return await SendRequest(request, DatabaseRequestTypes.RequestUpdateStorageItems, nameof(UpdateStorageItemsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> DeleteAllReservedStorageAsync()
+        {
+            return await SendRequest(EmptyMessage.Value, DatabaseRequestTypes.RequestDeleteAllReservedStorage, nameof(DeleteAllReservedStorageAsync));
+        }
+
         public async UniTask<DatabaseApiResult<MailListResp>> MailListAsync(MailListReq request)
         {
             return await SendRequest<MailListReq, MailListResp>(request, DatabaseRequestTypes.RequestMailList, nameof(MailListAsync));

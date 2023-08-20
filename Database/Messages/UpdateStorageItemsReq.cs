@@ -2,17 +2,19 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public partial struct ReadStorageItemsResp : INetSerializable
+    public partial struct UpdateStorageItemsReq : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {
-            Error = (UITextKeys)reader.GetByte();
+            StorageType = (StorageType)reader.GetByte();
+            StorageOwnerId = reader.GetString();
             StorageItems = reader.GetList<CharacterItem>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)Error);
+            writer.Put((byte)StorageType);
+            writer.Put(StorageOwnerId);
             writer.PutList(StorageItems);
         }
     }

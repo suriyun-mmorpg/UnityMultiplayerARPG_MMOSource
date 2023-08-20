@@ -143,6 +143,8 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, GetGuildGold);
             RegisterRequestToServer<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, ChangeGuildGold);
             RegisterRequestToServer<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, ReadStorageItems);
+            RegisterRequestToServer<UpdateStorageItemsReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateStorageItems, UpdateStorageItems);
+            RegisterRequestToServer<EmptyMessage, EmptyMessage>(DatabaseRequestTypes.RequestDeleteAllReservedStorage, DeleteAllReservedStorage);
             RegisterRequestToServer<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, MailList);
             RegisterRequestToServer<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, UpdateReadMailState);
             RegisterRequestToServer<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, UpdateClaimMailItemsState);
