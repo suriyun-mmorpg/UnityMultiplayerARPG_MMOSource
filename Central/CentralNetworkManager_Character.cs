@@ -65,7 +65,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Get characters from server
-            DatabaseApiResult<CharactersResp> charactersResp = await DbServiceClient.ReadCharactersAsync(new ReadCharactersReq()
+            DatabaseApiResult<CharactersResp> charactersResp = await DatabaseClient.ReadCharactersAsync(new ReadCharactersReq()
             {
                 UserId = userPeerInfo.userId
             });
@@ -128,7 +128,7 @@ namespace MultiplayerARPG.MMO
             }
 
             // Validate character name
-            DatabaseApiResult<FindCharacterNameResp> findCharacterNameResp = await DbServiceClient.FindCharacterNameAsync(new FindCharacterNameReq()
+            DatabaseApiResult<FindCharacterNameResp> findCharacterNameResp = await DatabaseClient.FindCharacterNameAsync(new FindCharacterNameReq()
             {
                 CharacterName = characterName
             });
@@ -186,7 +186,7 @@ namespace MultiplayerARPG.MMO
             characterData.Id = characterId;
             DataManager.SetNewPlayerCharacterData(characterData, characterName, dataId, entityId, factionId, publicBools, publicInts, publicFloats);
             DeserializeCreateCharacterExtra(characterData, reader);
-            DatabaseApiResult<CharacterResp> createResp = await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
+            DatabaseApiResult<CharacterResp> createResp = await DatabaseClient.CreateCharacterAsync(new CreateCharacterReq()
             {
                 UserId = userPeerInfo.userId,
                 CharacterData = characterData,
@@ -226,7 +226,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            DatabaseApiResult deleteResp = await DbServiceClient.DeleteCharacterAsync(new DeleteCharacterReq()
+            DatabaseApiResult deleteResp = await DatabaseClient.DeleteCharacterAsync(new DeleteCharacterReq()
             {
                 UserId = userPeerInfo.userId,
                 CharacterId = request.characterId
@@ -293,7 +293,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            DatabaseApiResult<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+            DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.ReadCharacterAsync(new ReadCharacterReq()
             {
                 UserId = userPeerInfo.userId,
                 CharacterId = request.characterId

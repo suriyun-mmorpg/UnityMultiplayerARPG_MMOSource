@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public ClusterServer ClusterServer { get; private set; }
-        public IDatabaseClient DbServiceClient { get; set; }
+        public IDatabaseClient DatabaseClient { get; set; }
         public ICentralServerDataManager DataManager { get; set; }
 #endif
         private Dictionary<string, ChannelData> _channels;
@@ -153,7 +153,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid UpdateCountUsers()
         {
             // Update user count
-            await DbServiceClient.UpdateUserCount(new UpdateUserCountReq()
+            await DatabaseClient.UpdateUserCount(new UpdateUserCountReq()
             {
                 UserCount = ClusterServer.MapUsersByCharacterId.Count,
             });
