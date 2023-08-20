@@ -175,14 +175,6 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             List<PlayerCharacterData> characters = await Database.ReadCharacters(request.UserId);
-            // Read and cache character (or load from cache)
-            long lastUpdate;
-            for (int i = 0; i < characters.Count; ++i)
-            {
-                lastUpdate = characters[i].LastUpdate;
-                characters[i] = await ReadCharacter(characters[i].Id);
-                characters[i].LastUpdate = lastUpdate;
-            }
             result.InvokeSuccess(new CharactersResp()
             {
                 List = characters
