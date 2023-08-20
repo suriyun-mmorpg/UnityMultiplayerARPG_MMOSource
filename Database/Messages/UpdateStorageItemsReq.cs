@@ -9,6 +9,7 @@ namespace MultiplayerARPG.MMO
             StorageType = (StorageType)reader.GetByte();
             StorageOwnerId = reader.GetString();
             StorageItems = reader.GetList<CharacterItem>();
+            DeleteStorageReservation = reader.GetBool();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -16,6 +17,7 @@ namespace MultiplayerARPG.MMO
             writer.Put((byte)StorageType);
             writer.Put(StorageOwnerId);
             writer.PutList(StorageItems);
+            writer.Put(DeleteStorageReservation);
         }
     }
 }

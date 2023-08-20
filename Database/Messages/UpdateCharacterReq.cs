@@ -13,6 +13,7 @@ namespace MultiplayerARPG.MMO
                 StorageItems = reader.GetList<CharacterItem>();
             else
                 StorageItems = null;
+            DeleteStorageReservation = reader.GetBool();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -23,6 +24,7 @@ namespace MultiplayerARPG.MMO
             writer.Put(isNull);
             if (!isNull)
                 writer.PutList(StorageItems);
+            writer.Put(DeleteStorageReservation);
         }
     }
 }

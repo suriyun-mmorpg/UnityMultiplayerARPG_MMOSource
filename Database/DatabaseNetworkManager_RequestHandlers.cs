@@ -195,7 +195,7 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
-                Database.UpdateCharacter(request.CharacterData, request.SummonBuffs, request.StorageItems),
+                Database.UpdateCharacter(request.CharacterData, request.SummonBuffs, request.StorageItems, request.DeleteStorageReservation),
             };
             if (!DisableDatabaseCaching)
             {
@@ -989,7 +989,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid UpdateStorageItems(RequestHandlerData requestHandler, UpdateStorageItemsReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-            if (request.StorageType == StorageType.Guild)
+            if (request.DeleteStorageReservation)
             {
                 // Delete reserver
                 await Database.DeleteReservedStorage(request.StorageType, request.StorageOwnerId);
