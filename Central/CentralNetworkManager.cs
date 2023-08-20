@@ -218,11 +218,13 @@ namespace MultiplayerARPG.MMO
         }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        public override void OnStartServer()
+        public override async void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
             ClusterServer.StartServer();
+            await UniTask.Delay(1000);
+            await DatabaseClient.DeleteAllReservedStorageAsync();
         }
 #endif
 
