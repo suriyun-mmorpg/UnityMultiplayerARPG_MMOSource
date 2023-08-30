@@ -183,7 +183,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.InvokeError(new ResponseUserRegisterMessage()
                 {
-                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
                 });
                 return;
             }
@@ -194,7 +194,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.InvokeError(new ResponseUserRegisterMessage()
                 {
-                    message = UITextKeys.UI_ERROR_INVALID_USERNAME
+                    message = UITextKeys.UI_ERROR_INVALID_USERNAME,
                 });
                 return;
             }

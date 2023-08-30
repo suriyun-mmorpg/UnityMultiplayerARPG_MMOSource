@@ -164,6 +164,8 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ReadCharacter(RequestHandlerData requestHandler, ReadCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            if (request.ForceClearCache)
+                await DatabaseCache.RemovePlayerCharacter(request.CharacterId);
             result.InvokeSuccess(new CharacterResp()
             {
                 CharacterData = await ReadCharacterWithUserIdValidation(request.CharacterId, request.UserId),

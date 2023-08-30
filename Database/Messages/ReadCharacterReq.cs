@@ -8,12 +8,14 @@ namespace MultiplayerARPG.MMO
         {
             UserId = reader.GetString();
             CharacterId = reader.GetString();
+            ForceClearCache = reader.GetBool();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(UserId);
             writer.Put(CharacterId);
+            writer.Put(ForceClearCache);
         }
     }
 }

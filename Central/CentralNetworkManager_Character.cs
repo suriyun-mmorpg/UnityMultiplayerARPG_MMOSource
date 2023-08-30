@@ -296,7 +296,8 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.ReadCharacterAsync(new ReadCharacterReq()
             {
                 UserId = userPeerInfo.userId,
-                CharacterId = request.characterId
+                CharacterId = request.characterId,
+                ForceClearCache = true,
             });
             if (!characterResp.IsSuccess)
             {
