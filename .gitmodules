@@ -1,3 +1,3 @@
 [submodule "Database/Src"]
 	path = Database/Src
-	url = https://github.com/insthync/UnityMultiplayerARPG_DatabaseManagerSource.git
+	url = ../UnityMultiplayerARPG_DatabaseManagerSource.git
