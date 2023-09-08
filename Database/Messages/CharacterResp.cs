@@ -6,12 +6,17 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
-            CharacterData = reader.Get(() => new PlayerCharacterData());
+            bool isNull = reader.GetBool();
+            if (!isNull)
+                CharacterData = reader.Get(() => new PlayerCharacterData());
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(CharacterData);
+            bool isNull = CharacterData == null;
+            writer.Put(isNull);
+            if (!isNull)
+                writer.Put(CharacterData);
         }
     }
 }
