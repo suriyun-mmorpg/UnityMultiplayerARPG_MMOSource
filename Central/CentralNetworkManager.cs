@@ -139,7 +139,7 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 ClusterServer.Update();
-                long currentTime = System.DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                long currentTime = System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 if (currentTime - _lastUserCountUpdateTime > updateUserCountInterval * 1000)
                 {
                     _lastUserCountUpdateTime = currentTime;
