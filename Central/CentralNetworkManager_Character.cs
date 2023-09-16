@@ -172,12 +172,12 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (!DataManager.CanCreateCharacter(dataId, entityId, factionId, publicBools, publicInts, publicFloats))
+            if (!DataManager.CanCreateCharacter(ref dataId, ref entityId, ref factionId, publicBools, publicInts, publicFloats, out UITextKeys errorMessage))
             {
                 // If there is factions, it must have faction with the id stored in faction dictionary
                 result.InvokeError(new ResponseCreateCharacterMessage()
                 {
-                    message = UITextKeys.UI_ERROR_INVALID_DATA,
+                    message = errorMessage,
                 });
                 return;
             }
