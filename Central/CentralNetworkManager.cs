@@ -4,6 +4,7 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using UnityEngine;
 #endif
