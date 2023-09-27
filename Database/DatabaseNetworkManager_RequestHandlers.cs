@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
 
@@ -15,6 +16,8 @@ namespace MultiplayerARPG.MMO
             new GuildRoleData() { roleName = "Member 5", canInvite = false, canKick = false, canUseStorage = false },
         };
         public static int[] GuildExpTree { get; set; } = new int[0];
+        protected readonly ConcurrentHashSet<string> _insertingCharacterNames = new ConcurrentHashSet<string>();
+        protected readonly ConcurrentHashSet<string> _insertingGuildNames = new ConcurrentHashSet<string>();
 
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
@@ -146,14 +149,22 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             PlayerCharacterData character = request.CharacterData;
+            if (_insertingCharacterNames.Contains(character.CharacterName))
+            {
+                result.InvokeError(new CharacterResp());
+                return;
+            }
+            _insertingCharacterNames.Add(character.CharacterName);
             long foundAmount = await FindCharacterName(character.CharacterName);
             if (foundAmount > 0)
             {
+                _insertingCharacterNames.TryRemove(character.CharacterName);
                 result.InvokeError(new CharacterResp());
                 return;
             }
             // Insert new character to database
             await Database.CreateCharacter(request.UserId, character);
+            _insertingCharacterNames.TryRemove(character.CharacterName);
             result.InvokeSuccess(new CharacterResp()
             {
                 CharacterData = character
@@ -496,16 +507,28 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid CreateGuild(RequestHandlerData requestHandler, CreateGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            if (_insertingGuildNames.Contains(request.GuildName))
+            {
+                result.InvokeError(new GuildResp());
+                return;
+            }
+            _insertingGuildNames.Add(request.GuildName);
             long foundAmount = await FindGuildName(request.GuildName);
             if (foundAmount > 0)
             {
+                _insertingGuildNames.TryRemove(request.GuildName);
                 result.InvokeError(new GuildResp());
                 return;
             }
             // Insert to database
             int guildId = await Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
             GuildData guild = new GuildData(guildId, request.GuildName, request.LeaderCharacterId, GuildMemberRoles);
-            // Cache the data, it will be used later
+            if (!DisableDatabaseCaching)
+            {
+                // Cache the data, it will be used later
+                await DatabaseCache.SetGuild(guild);
+            }
+            _insertingGuildNames.TryRemove(request.GuildName);
             result.InvokeSuccess(new GuildResp()
             {
                 GuildData = guild
