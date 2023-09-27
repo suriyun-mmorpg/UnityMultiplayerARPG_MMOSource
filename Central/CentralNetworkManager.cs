@@ -223,7 +223,7 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
             ClusterServer.StartServer();
-            await UniTask.Delay(1000);
+            await Task.Delay(1000);
             await DatabaseClient.DeleteAllReservedStorageAsync();
         }
 #endif
