@@ -12,7 +12,7 @@ using UnityEngine;
 namespace MultiplayerARPG.MMO
 {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-    [DefaultExecutionOrder(-897)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.CENTRAL_NETWORK_MANAGER)]
 #endif
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {

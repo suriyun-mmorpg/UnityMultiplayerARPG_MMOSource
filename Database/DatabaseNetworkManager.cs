@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG.MMO
 {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-    [DefaultExecutionOrder(-898)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.DATABASE_NETWORK_MANAGER)]
 #endif
     public partial class DatabaseNetworkManager : LiteNetLibManager.LiteNetLibManager
     {

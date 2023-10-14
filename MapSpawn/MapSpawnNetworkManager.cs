@@ -14,7 +14,7 @@ using UnityEngine;
 namespace MultiplayerARPG.MMO
 {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-    [DefaultExecutionOrder(-895)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.MAP_SPAWN_NETWORK_MANAGER)]
 #endif
     public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
