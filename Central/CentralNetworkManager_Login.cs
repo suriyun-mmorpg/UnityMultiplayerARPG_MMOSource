@@ -378,19 +378,6 @@ namespace MultiplayerARPG.MMO
             };
             _userPeersByUserId[userId] = userPeerInfo;
             _userPeers[connectionId] = userPeerInfo;
-            DatabaseApiResult updateAccessTokenResp = await DatabaseClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
-            {
-                UserId = userPeerInfo.userId,
-                AccessToken = accessToken
-            });
-            if (!updateAccessTokenResp.IsSuccess)
-            {
-                result.InvokeError(new ResponseValidateAccessTokenMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
             // Response
             result.InvokeSuccess(new ResponseValidateAccessTokenMessage()
             {
