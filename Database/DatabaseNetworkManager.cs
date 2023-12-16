@@ -79,11 +79,12 @@ namespace MultiplayerARPG.MMO
             maxConnections = int.MaxValue;
         }
 
-        public override void OnStartServer()
+        public override async void OnStartServer()
         {
             base.OnStartServer();
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             Database.Initialize();
+            await Database.DoMigration();
 #endif
         }
 
