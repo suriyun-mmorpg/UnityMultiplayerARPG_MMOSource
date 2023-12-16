@@ -374,7 +374,7 @@ namespace MultiplayerARPG.MMO
             {
                 connectionId = connectionId,
                 userId = userId,
-                accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", ""),
+                accessToken = accessToken,
             };
             _userPeersByUserId[userId] = userPeerInfo;
             _userPeers[connectionId] = userPeerInfo;
