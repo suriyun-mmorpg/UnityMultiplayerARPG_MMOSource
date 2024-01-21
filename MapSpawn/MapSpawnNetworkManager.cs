@@ -218,7 +218,7 @@ namespace MultiplayerARPG.MMO
                     {
                         while (_restartingScenes.TryDequeue(out StartingSceneData startSceneData))
                         {
-                            SpawnMap(startSceneData.mapName, startSceneData.channelId, startSceneData.isAllocate, startSceneData.instanceId, default, false, default, true);
+                            SpawnMap(startSceneData.channelId, startSceneData.mapName, startSceneData.isAllocate, startSceneData.instanceId, default, false, default, true);
                         }
                     }
                 }
