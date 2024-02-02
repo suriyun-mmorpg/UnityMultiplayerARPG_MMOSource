@@ -3,6 +3,7 @@ using LiteNetLibManager;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using UnityEngine;
 using UnityEngine.Serialization;
+using Cysharp.Threading.Tasks;
 #endif
 
 namespace MultiplayerARPG.MMO
@@ -25,8 +26,6 @@ namespace MultiplayerARPG.MMO
         [FormerlySerializedAs("disableCacheReading")]
 #endif
         private bool _disableDatabaseCaching = false;
-
-        private float? _requestQuitTime = null;
 
         public BaseDatabase Database
         {
@@ -51,6 +50,9 @@ namespace MultiplayerARPG.MMO
             get; set;
         }
 
+        public bool ProceedingBeforeQuit { get; private set; } = false;
+        public bool ReadyToQuit { get; private set; } = false;
+
         public void SetDatabaseByOptionIndex(int index)
         {
             if (databaseOptions != null &&
@@ -68,37 +70,6 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        protected virtual void Awake()
-        {
-            Application.wantsToQuit += Application_wantsToQuit;
-            _requestQuitTime = null;
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        protected override void OnDestroy()
-        {
-            Application.wantsToQuit -= Application_wantsToQuit;
-            base.OnDestroy();
-        }
-#endif
-
-        private bool Application_wantsToQuit()
-        {
-            if (!_requestQuitTime.HasValue)
-            {
-                _requestQuitTime = Time.unscaledTime;
-                return false;
-            }
-            if (Time.unscaledTime - _requestQuitTime.Value < 30f)
-            {
-                // Add delay 30 seconds before quit
-                return false;
-            }
-            return true;
-        }
-
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         protected override void Start()
         {
             Initialize();
@@ -110,6 +81,22 @@ namespace MultiplayerARPG.MMO
         {
             useWebSocket = false;
             maxConnections = int.MaxValue;
+        }
+
+        public async void ProceedBeforeQuit()
+        {
+            if (ProceedingBeforeQuit)
+                return;
+            ProceedingBeforeQuit = true;
+            // Delay 30 secs before quit
+#if NET || NETCOREAPP
+            await Task.Delay(30000);
+#else
+            await UniTask.Delay(30000);
+#endif
+            ReadyToQuit = true;
+            // Request to quit again
+            Application.Quit();
         }
 
         public override async void OnStartServer()
