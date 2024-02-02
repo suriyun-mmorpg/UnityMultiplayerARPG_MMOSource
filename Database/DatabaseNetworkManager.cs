@@ -89,11 +89,17 @@ namespace MultiplayerARPG.MMO
                 return;
             ProceedingBeforeQuit = true;
             // Delay 30 secs before quit
+            int seconds = 30;
+            do
+            {
+                Logging.Log($"[DatabaseNetworkManager] {seconds} seconds before quit.");
 #if NET || NETCOREAPP
-            await Task.Delay(30000);
+                await Task.Delay(1000);
 #else
-            await UniTask.Delay(30000);
+                await UniTask.Delay(1000);
 #endif
+                seconds--;
+            } while (seconds > 0);
             ReadyToQuit = true;
             // Request to quit again
             Application.Quit();
