@@ -24,7 +24,9 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         [FormerlySerializedAs("disableCacheReading")]
 #endif
-        private bool disableDatabaseCaching = false;
+        private bool _disableDatabaseCaching = false;
+
+        private float? _requestQuitTime = null;
 
         public BaseDatabase Database
         {
@@ -40,8 +42,8 @@ namespace MultiplayerARPG.MMO
 
         public bool DisableDatabaseCaching
         {
-            get { return disableDatabaseCaching; }
-            set { disableDatabaseCaching = value; }
+            get { return _disableDatabaseCaching; }
+            set { _disableDatabaseCaching = value; }
         }
 
         public IDatabaseCache DatabaseCache
@@ -64,6 +66,37 @@ namespace MultiplayerARPG.MMO
             Initialize();
         }
 #endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        protected virtual void Awake()
+        {
+            Application.wantsToQuit += Application_wantsToQuit;
+            _requestQuitTime = null;
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        protected override void OnDestroy()
+        {
+            Application.wantsToQuit -= Application_wantsToQuit;
+            base.OnDestroy();
+        }
+#endif
+
+        private bool Application_wantsToQuit()
+        {
+            if (!_requestQuitTime.HasValue)
+            {
+                _requestQuitTime = Time.unscaledTime;
+                return false;
+            }
+            if (Time.unscaledTime - _requestQuitTime.Value < 30f)
+            {
+                // Add delay 30 seconds before quit
+                return false;
+            }
+            return true;
+        }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         protected override void Start()
