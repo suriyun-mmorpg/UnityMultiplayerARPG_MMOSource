@@ -387,7 +387,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected async UniTaskVoid HandleRequestChannels(
+        protected UniTaskVoid HandleRequestChannels(
             RequestHandlerData requestHandler,
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseChannelsMessage> result)
@@ -398,8 +398,8 @@ namespace MultiplayerARPG.MMO
             {
                 channels = ClusterServer.GetChannels(),
             });
-            await UniTask.Yield();
 #endif
+            return default;
         }
     }
 }

@@ -242,12 +242,11 @@ namespace MultiplayerARPG.MMO
         }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        internal async UniTaskVoid HandleRequestSpawnMap(
+        internal UniTaskVoid HandleRequestSpawnMap(
             RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
-            await UniTask.Yield();
             UITextKeys message = UITextKeys.NONE;
             if (!ClusterClient.IsAppRegistered)
                 message = UITextKeys.UI_ERROR_APP_NOT_READY;
@@ -262,6 +261,7 @@ namespace MultiplayerARPG.MMO
                 });
             }
             SpawnMap(request, result, false);
+            return default;
         }
 #endif
 
