@@ -278,14 +278,14 @@ namespace MultiplayerARPG.MMO
             }
             foreach (BaseMapInfo spawningMap in spawningMaps)
             {
-                if (spawningMap == null || !spawningMap.IsSceneSet())
+                if (spawningMap == null || (!spawningMap.IsAddressableSceneValid() && !spawningMap.IsSceneValid()))
                     continue;
                 spawningMapByNames.Add(spawningMap.Id);
             }
             List<SpawnAllocateMapByNameData> spawningAllocateMapByNames = new List<SpawnAllocateMapByNameData>();
             foreach (SpawnAllocateMapData spawningAllocateMap in spawningAllocateMaps)
             {
-                if (spawningAllocateMap.mapInfo == null || !spawningAllocateMap.mapInfo.IsSceneSet())
+                if (spawningAllocateMap.mapInfo == null || (!spawningAllocateMap.mapInfo.IsAddressableSceneValid() && !spawningAllocateMap.mapInfo.IsSceneValid()))
                     continue;
                 spawningAllocateMapByNames.Add(new SpawnAllocateMapByNameData()
                 {
