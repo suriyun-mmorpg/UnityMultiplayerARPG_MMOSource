@@ -93,16 +93,18 @@ namespace MultiplayerARPG.MMO
             do
             {
                 Logging.Log($"[DatabaseNetworkManager] {seconds} seconds before quit.");
-#if NET || NETCOREAPP
-                await Task.Delay(1000);
-#else
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
                 await UniTask.Delay(1000);
+#elif NET || NETCOREAPP
+                await Task.Delay(1000);
 #endif
                 seconds--;
             } while (seconds > 0);
             ReadyToQuit = true;
             // Request to quit again
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             Application.Quit();
+#endif
         }
 
         public override async void OnStartServer()
