@@ -1,3 +1,4 @@
 [submodule "Database/Src"]
 	path = Database/Src
 	url = ../UnityMultiplayerARPG_DatabaseManagerSource.git
+	branch = main
