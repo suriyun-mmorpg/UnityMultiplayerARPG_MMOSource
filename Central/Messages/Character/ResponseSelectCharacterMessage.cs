@@ -5,14 +5,14 @@ namespace MultiplayerARPG.MMO
     public struct ResponseSelectCharacterMessage : INetSerializable
     {
         public UITextKeys message;
-        public string sceneName;
+        public string mapName;
         public string networkAddress;
         public int networkPort;
 
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
-            sceneName = reader.GetString();
+            mapName = reader.GetString();
             networkAddress = reader.GetString();
             networkPort = reader.GetInt();
         }
@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
-            writer.Put(sceneName);
+            writer.Put(mapName);
             writer.Put(networkAddress);
             writer.Put(networkPort);
         }
