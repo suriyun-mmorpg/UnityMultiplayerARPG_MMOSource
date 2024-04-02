@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseCharactersMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long connectionId = requestHandler.ConnectionId;
             if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {
@@ -90,7 +90,7 @@ namespace MultiplayerARPG.MMO
             RequestCreateCharacterMessage request,
             RequestProceedResultDelegate<ResponseCreateCharacterMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long connectionId = requestHandler.ConnectionId;
             NetDataReader reader = requestHandler.Reader;
             string characterName = request.characterName.Trim();
@@ -206,7 +206,7 @@ namespace MultiplayerARPG.MMO
 
         private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             this.InvokeInstanceDevExtMethods("DeserializeCreateCharacterExtra", characterData, reader);
 #endif
         }
@@ -216,7 +216,7 @@ namespace MultiplayerARPG.MMO
             RequestDeleteCharacterMessage request,
             RequestProceedResultDelegate<ResponseDeleteCharacterMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long connectionId = requestHandler.ConnectionId;
             if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {
@@ -251,7 +251,7 @@ namespace MultiplayerARPG.MMO
             RequestSelectCharacterMessage request,
             RequestProceedResultDelegate<ResponseSelectCharacterMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long connectionId = requestHandler.ConnectionId;
             if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {

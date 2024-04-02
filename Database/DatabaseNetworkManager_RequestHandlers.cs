@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new ValidateUserLoginResp()
             {
                 UserId = await Database.ValidateUserLogin(request.Username, request.Password),
@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ValidateAccessToken(RequestHandlerData requestHandler, ValidateAccessTokenReq request, RequestProceedResultDelegate<ValidateAccessTokenResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new ValidateAccessTokenResp()
             {
                 IsPass = await ValidateAccessToken(request.UserId, request.AccessToken),
@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetUserLevel(RequestHandlerData requestHandler, GetUserLevelReq request, RequestProceedResultDelegate<GetUserLevelResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetUserLevelResp()
             {
                 UserLevel = await Database.GetUserLevel(request.UserId),
@@ -51,7 +51,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetGold(RequestHandlerData requestHandler, GetGoldReq request, RequestProceedResultDelegate<GoldResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GoldResp()
             {
                 Gold = await ReadGold(request.UserId)
@@ -61,7 +61,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ChangeGold(RequestHandlerData requestHandler, ChangeGoldReq request, RequestProceedResultDelegate<GoldResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             int gold = await ReadGold(request.UserId);
             gold += request.ChangeAmount;
             if (!DisableDatabaseCaching)
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetCash(RequestHandlerData requestHandler, GetCashReq request, RequestProceedResultDelegate<CashResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new CashResp()
             {
                 Cash = await ReadCash(request.UserId)
@@ -90,7 +90,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ChangeCash(RequestHandlerData requestHandler, ChangeCashReq request, RequestProceedResultDelegate<CashResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             int cash = await ReadCash(request.UserId);
             cash += request.ChangeAmount;
             if (!DisableDatabaseCaching)
@@ -109,7 +109,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateAccessToken(RequestHandlerData requestHandler, UpdateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (!DisableDatabaseCaching)
             {
                 // Store access token to the dictionary, it will be used to validate later
@@ -123,7 +123,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid CreateUserLogin(RequestHandlerData requestHandler, CreateUserLoginReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (!DisableDatabaseCaching)
             {
                 // Cache username, it will be used to validate later
@@ -137,7 +137,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid FindUsername(RequestHandlerData requestHandler, FindUsernameReq request, RequestProceedResultDelegate<FindUsernameResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new FindUsernameResp()
             {
                 FoundAmount = await FindUsername(request.Username),
@@ -147,7 +147,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid CreateCharacter(RequestHandlerData requestHandler, CreateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             PlayerCharacterData character = request.CharacterData;
             if (_insertingCharacterNames.Contains(character.CharacterName))
             {
@@ -174,7 +174,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadCharacter(RequestHandlerData requestHandler, ReadCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (request.ForceClearCache)
                 await DatabaseCache.RemovePlayerCharacter(request.CharacterId);
             result.InvokeSuccess(new CharacterResp()
@@ -186,7 +186,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadCharacters(RequestHandlerData requestHandler, ReadCharactersReq request, RequestProceedResultDelegate<CharactersResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             List<PlayerCharacterData> characters = await Database.ReadCharacters(request.UserId);
             result.InvokeSuccess(new CharactersResp()
             {
@@ -197,7 +197,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateCharacter(RequestHandlerData requestHandler, UpdateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
                 Database.UpdateCharacter(request.CharacterData, request.SummonBuffs, request.StorageItems, request.DeleteStorageReservation),
@@ -219,7 +219,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid DeleteCharacter(RequestHandlerData requestHandler, DeleteCharacterReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             // Remove data from cache
             PlayerCharacterData playerCharacter = await ReadCharacter(request.CharacterId);
             if (!DisableDatabaseCaching)
@@ -240,7 +240,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid FindCharacterName(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<FindCharacterNameResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new FindCharacterNameResp()
             {
                 FoundAmount = await FindCharacterName(request.CharacterName),
@@ -250,7 +250,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid FindCharacters(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new SocialCharactersResp()
             {
                 List = await Database.FindCharacters(request.FinderId, request.CharacterName, request.Skip, request.Limit)
@@ -260,7 +260,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid CreateFriend(RequestHandlerData requestHandler, CreateFriendReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.CreateFriend(request.Character1Id, request.Character2Id, request.State);
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
@@ -268,7 +268,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid DeleteFriend(RequestHandlerData requestHandler, DeleteFriendReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.DeleteFriend(request.Character1Id, request.Character2Id);
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
@@ -276,7 +276,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadFriends(RequestHandlerData requestHandler, ReadFriendsReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new SocialCharactersResp()
             {
                 List = await Database.ReadFriends(request.CharacterId, request.ReadById2, request.State, request.Skip, request.Limit),
@@ -286,7 +286,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid CreateBuilding(RequestHandlerData requestHandler, CreateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             BuildingSaveData building = request.BuildingData;
             // Insert data to database
             await Database.CreateBuilding(request.ChannelId, request.MapName, building);
@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateBuilding(RequestHandlerData requestHandler, UpdateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
                 Database.UpdateBuilding(request.ChannelId, request.MapName, request.BuildingData, request.StorageItems),
@@ -325,7 +325,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid DeleteBuilding(RequestHandlerData requestHandler, DeleteBuildingReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (!DisableDatabaseCaching)
             {
                 // Remove data from cache
@@ -339,7 +339,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadBuildings(RequestHandlerData requestHandler, ReadBuildingsReq request, RequestProceedResultDelegate<BuildingsResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new BuildingsResp()
             {
                 List = await ReadBuildings(request.ChannelId, request.MapName),
@@ -349,7 +349,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid CreateParty(RequestHandlerData requestHandler, CreatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             // Insert to database
             int partyId = await Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId);
             PartyData party = new PartyData(partyId, request.ShareExp, request.ShareItem, request.LeaderCharacterId);
@@ -367,7 +367,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateParty(RequestHandlerData requestHandler, UpdatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             PartyData party = await ReadParty(request.PartyId);
             if (party == null)
             {
@@ -394,7 +394,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdatePartyLeader(RequestHandlerData requestHandler, UpdatePartyLeaderReq request, RequestProceedResultDelegate<PartyResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             PartyData party = await ReadParty(request.PartyId);
             if (party == null)
             {
@@ -421,7 +421,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid DeleteParty(RequestHandlerData requestHandler, DeletePartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (!DisableDatabaseCaching)
             {
                 // Remove data from cache
@@ -435,7 +435,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateCharacterParty(RequestHandlerData requestHandler, UpdateCharacterPartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             PartyData party = await ReadParty(request.PartyId);
             if (party == null)
             {
@@ -466,7 +466,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ClearCharacterParty(RequestHandlerData requestHandler, ClearCharacterPartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             PlayerCharacterData character = await ReadCharacter(request.CharacterId);
             if (character == null)
             {
@@ -496,7 +496,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadParty(RequestHandlerData requestHandler, ReadPartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new PartyResp()
             {
                 PartyData = await ReadParty(request.PartyId)
@@ -506,7 +506,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid CreateGuild(RequestHandlerData requestHandler, CreateGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (_insertingGuildNames.Contains(request.GuildName))
             {
                 result.InvokeError(new GuildResp());
@@ -538,7 +538,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildLeader(RequestHandlerData requestHandler, UpdateGuildLeaderReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -565,7 +565,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildMessage(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -592,7 +592,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildMessage2(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -619,7 +619,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildScore(RequestHandlerData requestHandler, UpdateGuildScoreReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -646,7 +646,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildOptions(RequestHandlerData requestHandler, UpdateGuildOptionsReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -673,7 +673,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildAutoAcceptRequests(RequestHandlerData requestHandler, UpdateGuildAutoAcceptRequestsReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -700,7 +700,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildRank(RequestHandlerData requestHandler, UpdateGuildRankReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -727,7 +727,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildRole(RequestHandlerData requestHandler, UpdateGuildRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -754,7 +754,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateGuildMemberRole(RequestHandlerData requestHandler, UpdateGuildMemberRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -781,7 +781,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid DeleteGuild(RequestHandlerData requestHandler, DeleteGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (!DisableDatabaseCaching)
             {
@@ -801,7 +801,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateCharacterGuild(RequestHandlerData requestHandler, UpdateCharacterGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -832,7 +832,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ClearCharacterGuild(RequestHandlerData requestHandler, ClearCharacterGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             PlayerCharacterData character = await ReadCharacter(request.CharacterId);
             if (character == null)
             {
@@ -863,7 +863,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid FindGuildName(RequestHandlerData requestHandler, FindGuildNameReq request, RequestProceedResultDelegate<FindGuildNameResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new FindGuildNameResp()
             {
                 FoundAmount = await FindGuildName(request.GuildName),
@@ -873,7 +873,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadGuild(RequestHandlerData requestHandler, ReadGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GuildResp()
             {
                 GuildData = await ReadGuild(request.GuildId)
@@ -883,7 +883,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid IncreaseGuildExp(RequestHandlerData requestHandler, IncreaseGuildExpReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -910,7 +910,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid AddGuildSkill(RequestHandlerData requestHandler, AddGuildSkillReq request, RequestProceedResultDelegate<GuildResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -937,7 +937,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetGuildGold(RequestHandlerData requestHandler, GetGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -956,7 +956,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ChangeGuildGold(RequestHandlerData requestHandler, ChangeGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             GuildData guild = await ReadGuild(request.GuildId);
             if (guild == null)
             {
@@ -983,7 +983,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ReadStorageItems(RequestHandlerData requestHandler, ReadStorageItemsReq request, RequestProceedResultDelegate<ReadStorageItemsResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (request.StorageType == StorageType.Guild)
             {
                 if (await Database.FindReservedStorage(request.StorageType, request.StorageOwnerId) > 0)
@@ -1005,7 +1005,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateStorageItems(RequestHandlerData requestHandler, UpdateStorageItemsReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (request.DeleteStorageReservation)
             {
                 // Delete reserver
@@ -1024,7 +1024,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid DeleteAllReservedStorage(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.DeleteAllReservedStorage();
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
@@ -1032,7 +1032,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid MailList(RequestHandlerData requestHandler, MailListReq request, RequestProceedResultDelegate<MailListResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new MailListResp()
             {
                 List = await Database.MailList(request.UserId, request.OnlyNewMails)
@@ -1042,7 +1042,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateReadMailState(RequestHandlerData requestHandler, UpdateReadMailStateReq request, RequestProceedResultDelegate<UpdateReadMailStateResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long updated = await Database.UpdateReadMailState(request.MailId, request.UserId);
             if (updated <= 0)
             {
@@ -1061,7 +1061,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateClaimMailItemsState(RequestHandlerData requestHandler, UpdateClaimMailItemsStateReq request, RequestProceedResultDelegate<UpdateClaimMailItemsStateResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long updated = await Database.UpdateClaimMailItemsState(request.MailId, request.UserId);
             if (updated <= 0)
             {
@@ -1080,7 +1080,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateDeleteMailState(RequestHandlerData requestHandler, UpdateDeleteMailStateReq request, RequestProceedResultDelegate<UpdateDeleteMailStateResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long updated = await Database.UpdateDeleteMailState(request.MailId, request.UserId);
             if (updated <= 0)
             {
@@ -1096,7 +1096,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid SendMail(RequestHandlerData requestHandler, SendMailReq request, RequestProceedResultDelegate<SendMailResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             Mail mail = request.Mail;
             if (string.IsNullOrEmpty(mail.ReceiverId))
             {
@@ -1121,7 +1121,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetMail(RequestHandlerData requestHandler, GetMailReq request, RequestProceedResultDelegate<GetMailResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetMailResp()
             {
                 Mail = await Database.GetMail(request.MailId, request.UserId),
@@ -1131,7 +1131,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetMailNotification(RequestHandlerData requestHandler, GetMailNotificationReq request, RequestProceedResultDelegate<GetMailNotificationResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetMailNotificationResp()
             {
                 NotificationCount = await Database.GetMailNotification(request.UserId),
@@ -1141,7 +1141,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetIdByCharacterName(RequestHandlerData requestHandler, GetIdByCharacterNameReq request, RequestProceedResultDelegate<GetIdByCharacterNameResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetIdByCharacterNameResp()
             {
                 Id = await Database.GetIdByCharacterName(request.CharacterName),
@@ -1151,7 +1151,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetUserIdByCharacterName(RequestHandlerData requestHandler, GetUserIdByCharacterNameReq request, RequestProceedResultDelegate<GetUserIdByCharacterNameResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetUserIdByCharacterNameResp()
             {
                 UserId = await Database.GetUserIdByCharacterName(request.CharacterName),
@@ -1161,7 +1161,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetUserUnbanTime(RequestHandlerData requestHandler, GetUserUnbanTimeReq request, RequestProceedResultDelegate<GetUserUnbanTimeResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long unbanTime = await Database.GetUserUnbanTime(request.UserId);
             result.InvokeSuccess(new GetUserUnbanTimeResp()
             {
@@ -1172,7 +1172,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid SetUserUnbanTimeByCharacterName(RequestHandlerData requestHandler, SetUserUnbanTimeByCharacterNameReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.SetUserUnbanTimeByCharacterName(request.CharacterName, request.UnbanTime);
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
@@ -1180,7 +1180,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid SetCharacterUnmuteTimeByName(RequestHandlerData requestHandler, SetCharacterUnmuteTimeByNameReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.SetCharacterUnmuteTimeByName(request.CharacterName, request.UnmuteTime);
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
@@ -1188,7 +1188,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetSummonBuffs(RequestHandlerData requestHandler, GetSummonBuffsReq request, RequestProceedResultDelegate<GetSummonBuffsResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetSummonBuffsResp()
             {
                 SummonBuffs = await Database.GetSummonBuffs(request.CharacterId),
@@ -1198,7 +1198,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid FindEmail(RequestHandlerData requestHandler, FindEmailReq request, RequestProceedResultDelegate<FindEmailResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new FindEmailResp()
             {
                 FoundAmount = await FindEmail(request.Email),
@@ -1208,7 +1208,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid ValidateEmailVerification(RequestHandlerData requestHandler, ValidateEmailVerificationReq request, RequestProceedResultDelegate<ValidateEmailVerificationResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new ValidateEmailVerificationResp()
             {
                 IsPass = await Database.ValidateEmailVerification(request.UserId),
@@ -1218,7 +1218,7 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid GetFriendRequestNotification(RequestHandlerData requestHandler, GetFriendRequestNotificationReq request, RequestProceedResultDelegate<GetFriendRequestNotificationResp> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new GetFriendRequestNotificationResp()
             {
                 NotificationCount = await Database.GetFriendRequestNotification(request.CharacterId),
@@ -1228,13 +1228,13 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTaskVoid UpdateUserCount(RequestHandlerData requestHandler, UpdateUserCountReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.UpdateUserCount(request.UserCount);
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
         }
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
 
         protected async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
         {
