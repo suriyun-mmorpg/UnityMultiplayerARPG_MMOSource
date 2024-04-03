@@ -2,16 +2,16 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public partial struct ReadGuildReq : INetSerializable
+    public partial struct GetGuildRequestNotificationResp : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {
-            GuildId = reader.GetPackedInt();
+            NotificationCount = reader.GetInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedInt(GuildId);
+            writer.Put(NotificationCount);
         }
     }
 }

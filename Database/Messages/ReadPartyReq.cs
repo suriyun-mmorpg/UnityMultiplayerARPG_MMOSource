@@ -6,12 +6,12 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
-            PartyId = reader.GetInt();
+            PartyId = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(PartyId);
+            writer.PutPackedInt(PartyId);
         }
     }
 }
