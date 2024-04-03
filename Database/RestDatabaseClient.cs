@@ -419,9 +419,9 @@ namespace MultiplayerARPG.MMO
             return await SendRequest<ReadSocialCharacterReq, SocialCharacterResp>(request, GetUrl(apiUrl, DatabaseApiPath.ReadSocialCharacter), nameof(ReadSocialCharacterAsync));
         }
 
-        public async UniTask<DatabaseApiResult<GuildsResp>> FindGuildsAsync(FindGuildsReq request)
+        public async UniTask<DatabaseApiResult<GuildsResp>> FindGuildsAsync(FindGuildNameReq request)
         {
-            return await SendRequest<FindGuildsReq, GuildsResp>(request, GetUrl(apiUrl, DatabaseApiPath.FindGuilds), nameof(FindGuildsAsync));
+            return await SendRequest<FindGuildNameReq, GuildsResp>(request, GetUrl(apiUrl, DatabaseApiPath.FindGuilds), nameof(FindGuildsAsync));
         }
 
         public async UniTask<DatabaseApiResult> CreateGuildRequestAsync(CreateGuildRequestReq request)

@@ -190,6 +190,12 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, FindEmail);
             RegisterRequestToServer<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, ValidateEmailVerification);
             RegisterRequestToServer<UpdateUserCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateUserCount, UpdateUserCount);
+            RegisterRequestToServer<ReadSocialCharacterReq, SocialCharacterResp>(DatabaseRequestTypes.RequestReadSocialCharacter, ReadSocialCharacter);
+            RegisterRequestToServer<FindGuildNameReq, GuildsResp>(DatabaseRequestTypes.RequestFindGuilds, FindGuilds);
+            RegisterRequestToServer<CreateGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateGuildRequest, CreateGuildRequest);
+            RegisterRequestToServer<DeleteGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuildRequest, DeleteGuildRequest);
+            RegisterRequestToServer<GetGuildRequestsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestGetGuildRequests, GetGuildRequests);
+            RegisterRequestToServer<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(DatabaseRequestTypes.RequestGetGuildRequestNotification, GetGuildRequestNotification);
             this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
     }

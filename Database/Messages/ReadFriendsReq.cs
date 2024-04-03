@@ -9,8 +9,8 @@ namespace MultiplayerARPG.MMO
             CharacterId = reader.GetString();
             ReadById2 = reader.GetBool();
             State = reader.GetByte();
-            Skip = reader.GetInt();
-            Limit = reader.GetInt();
+            Skip = reader.GetPackedInt();
+            Limit = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -18,8 +18,8 @@ namespace MultiplayerARPG.MMO
             writer.Put(CharacterId);
             writer.Put(ReadById2);
             writer.Put(State);
-            writer.Put(Skip);
-            writer.Put(Limit);
+            writer.PutPackedInt(Skip);
+            writer.PutPackedInt(Limit);
         }
     }
 }

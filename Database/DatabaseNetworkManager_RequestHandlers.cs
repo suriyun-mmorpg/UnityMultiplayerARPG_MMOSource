@@ -1234,6 +1234,62 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid ReadSocialCharacter(RequestHandlerData requestHandler, ReadSocialCharacterReq request, RequestProceedResultDelegate<SocialCharacterResp> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            result.InvokeSuccess(new SocialCharacterResp()
+            {
+                SocialCharacterData = await ReadSocialCharacter(request.CharacterId),
+            });
+#endif
+        }
+
+        protected async UniTaskVoid FindGuilds(RequestHandlerData requestHandler, FindGuildNameReq request, RequestProceedResultDelegate<GuildsResp> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            result.InvokeSuccess(new GuildsResp()
+            {
+                List = await Database.FindGuilds(request.FinderId, request.GuildName, request.Skip, request.Limit)
+            });
+#endif
+        }
+
+        protected async UniTaskVoid CreateGuildRequest(RequestHandlerData requestHandler, CreateGuildRequestReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            await Database.CreateGuildRequest(request.GuildId, request.RequesterId);
+            result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
+        protected async UniTaskVoid DeleteGuildRequest(RequestHandlerData requestHandler, DeleteGuildRequestReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            await Database.DeleteGuildRequest(request.GuildId, request.RequesterId);
+            result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
+        protected async UniTaskVoid GetGuildRequests(RequestHandlerData requestHandler, GetGuildRequestsReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            result.InvokeSuccess(new SocialCharactersResp()
+            {
+                List = await Database.GetGuildRequests(request.GuildId, request.Skip, request.Limit)
+            });
+#endif
+        }
+
+        protected async UniTaskVoid GetGuildRequestNotification(RequestHandlerData requestHandler, GetGuildRequestNotificationReq request, RequestProceedResultDelegate<GetGuildRequestNotificationResp> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            result.InvokeSuccess(new GetGuildRequestNotificationResp()
+            {
+                NotificationCount = await Database.GetGuildRequestsNotification(request.GuildId),
+            });
+#endif
+        }
+
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
 
         protected async UniTask<bool> ValidateAccessToken(string userId, string accessToken)

@@ -8,16 +8,16 @@ namespace MultiplayerARPG.MMO
         {
             FinderId = reader.GetString();
             CharacterName = reader.GetString();
-            Skip = reader.GetInt();
-            Limit = reader.GetInt();
+            Skip = reader.GetPackedInt();
+            Limit = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(FinderId);
             writer.Put(CharacterName);
-            writer.Put(Skip);
-            writer.Put(Limit);
+            writer.PutPackedInt(Skip);
+            writer.PutPackedInt(Limit);
         }
     }
 }
