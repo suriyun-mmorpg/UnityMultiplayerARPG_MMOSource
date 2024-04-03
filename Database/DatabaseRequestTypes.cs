@@ -72,5 +72,11 @@
         public const ushort RequestFindEmail = 76;
         public const ushort RequestGetFriendRequestNotification = 77;
         public const ushort RequestUpdateUserCount = 78;
+        public const ushort RequestReadSocialCharacter = 79;
+        public const ushort RequestFindGuilds = 80;
+        public const ushort RequestCreateGuildRequest = 81;
+        public const ushort RequestDeleteGuildRequest = 82;
+        public const ushort RequestGetGuildRequests = 83;
+        public const ushort RequestGetGuildRequestNotification = 84;
     }
 }

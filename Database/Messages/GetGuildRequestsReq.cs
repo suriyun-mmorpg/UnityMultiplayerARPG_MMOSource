@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public partial struct GetGuildRequestsReq
+    public partial struct GetGuildRequestsReq : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {

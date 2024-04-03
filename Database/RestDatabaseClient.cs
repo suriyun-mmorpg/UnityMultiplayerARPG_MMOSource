@@ -413,5 +413,35 @@ namespace MultiplayerARPG.MMO
         {
             return await SendRequest(request, GetUrl(apiUrl, DatabaseApiPath.UpdateUserCount), nameof(UpdateUserCount));
         }
+
+        public async UniTask<DatabaseApiResult<SocialCharacterResp>> ReadSocialCharacterAsync(ReadSocialCharacterReq request)
+        {
+            return await SendRequest<ReadSocialCharacterReq, SocialCharacterResp>(request, GetUrl(apiUrl, DatabaseApiPath.ReadSocialCharacter), nameof(ReadSocialCharacterAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<GuildsResp>> FindGuildsAsync(FindGuildsReq request)
+        {
+            return await SendRequest<FindGuildsReq, GuildsResp>(request, GetUrl(apiUrl, DatabaseApiPath.FindGuilds), nameof(FindGuildsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> CreateGuildRequestAsync(CreateGuildRequestReq request)
+        {
+            return await SendRequest(request, GetUrl(apiUrl, DatabaseApiPath.CreateGuildRequest), nameof(CreateGuildRequestAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> DeleteGuildRequestAsync(DeleteGuildRequestReq request)
+        {
+            return await SendRequest(request, GetUrl(apiUrl, DatabaseApiPath.DeleteGuildRequest), nameof(DeleteGuildRequestAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<SocialCharactersResp>> GetGuildRequestsAsync(GetGuildRequestsReq request)
+        {
+            return await SendRequest<GetGuildRequestsReq, SocialCharactersResp>(request, GetUrl(apiUrl, DatabaseApiPath.GetGuildRequests), nameof(GetGuildRequestsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<GetGuildRequestNotificationResp>> GetGuildRequestNotificationAsync(GetGuildRequestNotificationReq request)
+        {
+            return await SendRequest<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(request, GetUrl(apiUrl, DatabaseApiPath.GetGuildRequestNotification), nameof(GetGuildRequestNotificationAsync));
+        }
     }
 }

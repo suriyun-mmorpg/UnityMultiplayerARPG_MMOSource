@@ -380,5 +380,35 @@ namespace MultiplayerARPG.MMO
         {
             return await SendRequest(request, DatabaseRequestTypes.RequestUpdateUserCount, nameof(UpdateUserCount));
         }
+
+        public async UniTask<DatabaseApiResult<SocialCharacterResp>> ReadSocialCharacterAsync(ReadSocialCharacterReq request)
+        {
+            return await SendRequest<ReadSocialCharacterReq, SocialCharacterResp>(request, DatabaseRequestTypes.RequestReadSocialCharacter, nameof(ReadSocialCharacterAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<GuildsResp>> FindGuildsAsync(FindGuildsReq request)
+        {
+            return await SendRequest<FindGuildsReq, GuildsResp>(request, DatabaseRequestTypes.RequestFindGuilds, nameof(FindGuildsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> CreateGuildRequestAsync(CreateGuildRequestReq request)
+        {
+            return await SendRequest(request, DatabaseRequestTypes.RequestCreateGuildRequest, nameof(CreateGuildRequestAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> DeleteGuildRequestAsync(DeleteGuildRequestReq request)
+        {
+            return await SendRequest(request, DatabaseRequestTypes.RequestDeleteGuildRequest, nameof(DeleteGuildRequestAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<SocialCharactersResp>> GetGuildRequestsAsync(GetGuildRequestsReq request)
+        {
+            return await SendRequest<GetGuildRequestsReq, SocialCharactersResp>(request, DatabaseRequestTypes.RequestGetGuildRequests, nameof(GetGuildRequestsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<GetGuildRequestNotificationResp>> GetGuildRequestNotificationAsync(GetGuildRequestNotificationReq request)
+        {
+            return await SendRequest<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(request, DatabaseRequestTypes.RequestGetGuildRequestNotification, nameof(GetGuildRequestNotificationAsync));
+        }
     }
 }
