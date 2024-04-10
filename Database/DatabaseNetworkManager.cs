@@ -110,8 +110,10 @@ namespace MultiplayerARPG.MMO
         public override async void OnStartServer()
         {
             base.OnStartServer();
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             Database.Initialize();
+#endif
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.DoMigration();
 #endif
         }
