@@ -1400,6 +1400,8 @@ namespace MultiplayerARPG.MMO
             }
             // Read buildings from database
             List<BuildingSaveData> buildings = await Database.ReadBuildings(channel, mapName);
+            if (buildings == null)
+                buildings = new List<BuildingSaveData>();
             if (!DisableDatabaseCaching)
             {
                 // Store buildings to cache
@@ -1554,6 +1556,8 @@ namespace MultiplayerARPG.MMO
             }
             // Read storageItems from database
             List<CharacterItem> storageItems = await Database.ReadStorageItems(storageType, storageOwnerId);
+            if (storageItems == null)
+                storageItems = new List<CharacterItem>();
             if (!DisableDatabaseCaching)
             {
                 // Store storageItems to cache
