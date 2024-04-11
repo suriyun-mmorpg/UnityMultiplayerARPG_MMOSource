@@ -8,11 +8,14 @@ namespace MultiplayerARPG.MMO
     {
         public override string LogTag { get { return nameof(ClusterClient) + ":" + _appServer.PeerType; } }
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-        public System.Action<AckResponseCode> onResponseAppServerRegister;
-        public System.Action<AckResponseCode, CentralServerPeerInfo> onResponseAppServerAddress;
-        public System.Action<AckResponseCode, int> onResponseUserCount;
-        public System.Action<string, UITextKeys> onKickUser;
-        public System.Action<string, string> onPlayerCharacterRemoved;
+        public delegate void OnResponseAppServerRegister(AckResponseCode responseCode);
+        public OnResponseAppServerRegister onResponseAppServerRegister;
+        public delegate void OnResponseAppServerAddress(AckResponseCode responseCode, CentralServerPeerInfo peerInfo);
+        public OnResponseAppServerAddress onResponseAppServerAddress;
+        public delegate void OnKickUser(string userId, UITextKeys message);
+        public OnKickUser onKickUser;
+        public delegate void OnPlayerCharacterRemovedDelegate(string userId, string characterId);
+        public OnPlayerCharacterRemovedDelegate onPlayerCharacterRemoved;
         public bool IsAppRegistered { get; private set; }
 #endif
         private readonly IAppServer _appServer;
@@ -24,7 +27,8 @@ namespace MultiplayerARPG.MMO
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
-            RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount, HandleResponseUserCount);
+            RegisterResponseHandler<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken);
+            RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount);
             RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
             RegisterMessageHandler(MMOMessageTypes.KickUser, HandleKickUser);
             RegisterMessageHandler(MMOMessageTypes.PlayerCharacterRemoved, HandlePlayerCharacterRemoved);
@@ -185,17 +189,6 @@ namespace MultiplayerARPG.MMO
         {
             if (onResponseAppServerAddress != null)
                 onResponseAppServerAddress.Invoke(responseCode, response.peerInfo);
-        }
-#endif
-
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-        private void HandleResponseUserCount(
-            ResponseHandlerData responseHandler,
-            AckResponseCode responseCode,
-            ResponseUserCountMessage response)
-        {
-            if (onResponseUserCount != null)
-                onResponseUserCount.Invoke(responseCode, response.userCount);
         }
 #endif
 
