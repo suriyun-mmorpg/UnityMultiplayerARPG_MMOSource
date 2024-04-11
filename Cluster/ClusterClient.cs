@@ -12,6 +12,8 @@ namespace MultiplayerARPG.MMO
         public OnResponseAppServerRegister onResponseAppServerRegister;
         public delegate void OnResponseAppServerAddress(AckResponseCode responseCode, CentralServerPeerInfo peerInfo);
         public OnResponseAppServerAddress onResponseAppServerAddress;
+        public delegate void OnResponseUserCount(AckResponseCode responseCode, int userCount);
+        public OnResponseUserCount onResponseUserCount;
         public delegate void OnKickUser(string userId, UITextKeys message);
         public OnKickUser onKickUser;
         public delegate void OnPlayerCharacterRemovedDelegate(string userId, string characterId);
@@ -27,7 +29,6 @@ namespace MultiplayerARPG.MMO
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
-            RegisterResponseHandler<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken);
             RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount);
             RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
             RegisterMessageHandler(MMOMessageTypes.KickUser, HandleKickUser);
@@ -189,6 +190,17 @@ namespace MultiplayerARPG.MMO
         {
             if (onResponseAppServerAddress != null)
                 onResponseAppServerAddress.Invoke(responseCode, response.peerInfo);
+        }
+#endif
+
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+        private void HandleResponseUserCount(
+            ResponseHandlerData responseHandler,
+            AckResponseCode responseCode,
+            ResponseUserCountMessage response)
+        {
+            if (onResponseUserCount != null)
+                onResponseUserCount.Invoke(responseCode, response.userCount);
         }
 #endif
 
