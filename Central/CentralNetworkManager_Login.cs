@@ -76,7 +76,6 @@ namespace MultiplayerARPG.MMO
             }
             string userId = validateUserLoginResp.Response.UserId;
             string accessToken = string.Empty;
-            long unbanTime = 0;
             if (string.IsNullOrEmpty(userId))
             {
                 result.InvokeError(new ResponseUserLoginMessage()
@@ -85,6 +84,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // User already logged in
             if (_userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
             {
                 // Kick the user from game
@@ -98,6 +98,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Email verification
             bool emailVerified = true;
             if (requireEmailVerification)
             {
@@ -115,6 +116,7 @@ namespace MultiplayerARPG.MMO
                 }
                 emailVerified = validateEmailVerificationResp.Response.IsPass;
             }
+            // Banning verification
             DatabaseApiResult<GetUserUnbanTimeResp> unbanTimeResp = await DatabaseClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
             {
                 UserId = userId
@@ -127,7 +129,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            unbanTime = unbanTimeResp.Response.UnbanTime;
+            long unbanTime = unbanTimeResp.Response.UnbanTime;
             if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 result.InvokeError(new ResponseUserLoginMessage()
@@ -144,12 +146,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
-            userPeerInfo.connectionId = connectionId;
-            userPeerInfo.userId = userId;
-            userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
-            _userPeersByUserId[userId] = userPeerInfo;
-            _userPeers[connectionId] = userPeerInfo;
+            // Generate new access token
+            accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
             DatabaseApiResult updateAccessTokenResp = await DatabaseClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userId,
@@ -163,6 +161,15 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Update peer info
+            CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo()
+            {
+                connectionId = connectionId,
+                userId = userId,
+                accessToken = accessToken,
+            };
+            _userPeersByUserId[userId] = userPeerInfo;
+            _userPeers[connectionId] = userPeerInfo;
             // Response
             result.InvokeSuccess(new ResponseUserLoginMessage()
             {
@@ -326,7 +333,6 @@ namespace MultiplayerARPG.MMO
             long connectionId = requestHandler.ConnectionId;
             string userId = request.userId;
             string accessToken = request.accessToken;
-            long unbanTime = 0;
             DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DatabaseClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
@@ -348,6 +354,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Banning verification
             DatabaseApiResult<GetUserUnbanTimeResp> unbanTimeResp = await DatabaseClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
             {
                 UserId = userId
@@ -360,7 +367,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            unbanTime = unbanTimeResp.Response.UnbanTime;
+            long unbanTime = unbanTimeResp.Response.UnbanTime;
             if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
             {
                 result.InvokeError(new ResponseValidateAccessTokenMessage()
@@ -369,6 +376,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Update peer info
             RemoveUserPeerByUserId(userId, out _);
             CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo()
             {
@@ -383,6 +391,7 @@ namespace MultiplayerARPG.MMO
             {
                 userId = userId,
                 accessToken = accessToken,
+                unbanTime = unbanTime,
             });
 #endif
         }
