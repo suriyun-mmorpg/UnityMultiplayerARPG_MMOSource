@@ -36,23 +36,23 @@ namespace MultiplayerARPG.MMO
         private Dictionary<long, CentralServerPeerInfo> _mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public IReadOnlyDictionary<long, CentralServerPeerInfo> MapServerPeers => _mapServerPeers;
 
-        private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByMapId = new Dictionary<string, CentralServerPeerInfo>();
+        private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByKey = new Dictionary<string, CentralServerPeerInfo>();
         /// <summary>
         /// Key is `{channelId}_{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByMapId => _mapServerPeersByMapId;
+        public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByKey => _mapServerPeersByKey;
 
-        private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
+        private Dictionary<string, CentralServerPeerInfo> _instanceMapServerPeersByKey = new Dictionary<string, CentralServerPeerInfo>();
         /// <summary>
         /// Key is `{channelId}_{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByInstanceId => _mapServerPeersByInstanceId;
+        public IReadOnlyDictionary<string, CentralServerPeerInfo> InstanceMapServerPeersByKey => _instanceMapServerPeersByKey;
 
-        private Dictionary<string, List<CentralServerPeerInfo>> _allocateMapServerPeersByMapId = new Dictionary<string, List<CentralServerPeerInfo>>();
+        private Dictionary<string, List<CentralServerPeerInfo>> _allocateMapServerPeersByRefId = new Dictionary<string, List<CentralServerPeerInfo>>();
         /// <summary>
         /// Key is `{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, List<CentralServerPeerInfo>> AllocateMapServerPeersByMapId => _allocateMapServerPeersByMapId;
+        public IReadOnlyDictionary<string, List<CentralServerPeerInfo>> AllocateMapServerPeersByRefId => _allocateMapServerPeersByRefId;
 
         private Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> _mapSpawnResultActions = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
         /// <summary>
@@ -102,9 +102,9 @@ namespace MultiplayerARPG.MMO
             _connectionIdsByDespawningCharacterId.Clear();
             _mapSpawnServerPeers.Clear();
             _mapServerPeers.Clear();
-            _mapServerPeersByMapId.Clear();
-            _mapServerPeersByInstanceId.Clear();
-            _allocateMapServerPeersByMapId.Clear();
+            _mapServerPeersByKey.Clear();
+            _instanceMapServerPeersByKey.Clear();
+            _allocateMapServerPeersByRefId.Clear();
         }
 #endif
 
@@ -115,14 +115,14 @@ namespace MultiplayerARPG.MMO
             switch (eventData.type)
             {
                 case ENetworkEvent.ConnectEvent:
-                    Logging.Log(LogTag, "OnPeerConnected peer.ConnectionId: " + eventData.connectionId);
+                    Logging.Log(LogTag, $"OnPeerConnected peer.ConnectionId: {eventData.connectionId}");
                     ConnectionIds.Add(eventData.connectionId);
                     break;
                 case ENetworkEvent.DataEvent:
                     ReadPacket(eventData.connectionId, eventData.reader);
                     break;
                 case ENetworkEvent.DisconnectEvent:
-                    Logging.Log(LogTag, "OnPeerDisconnected peer.ConnectionId: " + eventData.connectionId + " disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
+                    Logging.Log(LogTag, $"OnPeerDisconnected peer.ConnectionId: {eventData.connectionId} disconnectInfo.Reason: {eventData.disconnectInfo.Reason}");
                     ConnectionIds.Remove(eventData.connectionId);
                     // Remove disconnect map spawn server
                     _mapSpawnServerPeers.Remove(eventData.connectionId);
@@ -130,15 +130,15 @@ namespace MultiplayerARPG.MMO
                     if (_mapServerPeers.TryGetValue(eventData.connectionId, out tempPeerInfo))
                     {
                         string key = tempPeerInfo.GetPeerInfoKey();
-                        _mapServerPeersByMapId.Remove(key);
-                        _mapServerPeersByInstanceId.Remove(key);
+                        _mapServerPeersByKey.Remove(key);
+                        _instanceMapServerPeersByKey.Remove(key);
                         _mapServerPeers.Remove(eventData.connectionId);
                         RemoveMapUsers(eventData.connectionId);
                     }
                     RemoveAllocateMapServer(eventData.connectionId);
                     break;
                 case ENetworkEvent.ErrorEvent:
-                    Logging.LogError(LogTag, "OnPeerNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError + " errorMessage " + eventData.errorMessage);
+                    Logging.LogError(LogTag, $"OnPeerNetworkError endPoint: {eventData.endPoint } socketErrorCode {eventData.socketError } errorMessage {eventData.errorMessage}");
                     break;
             }
         }
@@ -147,16 +147,16 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void RemoveAllocateMapServer(long connectionId)
         {
-            List<string> keys = new List<string>(_allocateMapServerPeersByMapId.Keys);
+            List<string> keys = new List<string>(_allocateMapServerPeersByRefId.Keys);
             for (int i = 0; i < keys.Count; ++i)
             {
                 string key = keys[i];
-                List<CentralServerPeerInfo> allocatePeers = _allocateMapServerPeersByMapId[key];
+                List<CentralServerPeerInfo> allocatePeers = _allocateMapServerPeersByRefId[key];
                 for (int j = allocatePeers.Count - 1; j >= 0; --j)
                 {
                     if (allocatePeers[j].connectionId == connectionId)
                     {
-                        _allocateMapServerPeersByMapId[key].RemoveAt(j);
+                        _allocateMapServerPeersByRefId[key].RemoveAt(j);
                     }
                 }
             }
@@ -202,10 +202,10 @@ namespace MultiplayerARPG.MMO
                 {
                     case CentralServerPeerType.MapSpawnServer:
                         _mapSpawnServerPeers[connectionId] = peerInfo;
-                        Logging.Log(LogTag, "Register Map Spawn Server: [" + connectionId + "]");
+                        Logging.Log(LogTag, $"Register Map Spawn Server: [{connectionId}]");
                         break;
                     case CentralServerPeerType.MapServer:
-                        if (!_mapServerPeersByMapId.ContainsKey(key))
+                        if (!_mapServerPeersByKey.ContainsKey(key))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Tell the map-server which request for a spawning that the map spawned
@@ -218,18 +218,18 @@ namespace MultiplayerARPG.MMO
                                 });
                             }
                             // Collects server data
-                            _mapServerPeersByMapId[key] = peerInfo;
+                            _mapServerPeersByKey[key] = peerInfo;
                             _mapServerPeers[connectionId] = peerInfo;
-                            Logging.Log(LogTag, "Register Map Server: [" + connectionId + "] [" + key + "]");
+                            Logging.Log(LogTag, $"Register Map Server: [{connectionId}] [{key}]");
                         }
                         else
                         {
                             message = UITextKeys.UI_ERROR_MAP_EXISTED;
-                            Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + key + "] [" + message + "]");
+                            Logging.Log(LogTag, $"Register Map Server Failed: [{connectionId}] [{key}] [{message}]");
                         }
                         break;
                     case CentralServerPeerType.InstanceMapServer:
-                        if (!_mapServerPeersByInstanceId.ContainsKey(key))
+                        if (!_instanceMapServerPeersByKey.ContainsKey(key))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Tell the map-server which request for a spawning that the map spawned
@@ -242,29 +242,29 @@ namespace MultiplayerARPG.MMO
                                 });
                             }
                             // Collects server data
-                            _mapServerPeersByInstanceId[key] = peerInfo;
+                            _instanceMapServerPeersByKey[key] = peerInfo;
                             _mapServerPeers[connectionId] = peerInfo;
-                            Logging.Log(LogTag, "Register Instance Map Server: [" + connectionId + "] [" + key + "]");
+                            Logging.Log(LogTag, $"Register Instance Map Server: [{connectionId}] [{key}]");
                         }
                         else
                         {
                             message = UITextKeys.UI_ERROR_EVENT_EXISTED;
-                            Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + key + "] [" + message + "]");
+                            Logging.Log(LogTag, $"Register Instance Map Server Failed: [{connectionId}] [{key}] [{message}]");
                         }
                         break;
                     case CentralServerPeerType.AllocateMapServer:
                         // Create a new collection if it is not existed
-                        if (!_allocateMapServerPeersByMapId.ContainsKey(peerInfo.refId))
-                            _allocateMapServerPeersByMapId.Add(peerInfo.refId, new List<CentralServerPeerInfo>());
-                        _allocateMapServerPeersByMapId[peerInfo.refId].Add(peerInfo);
-                        Logging.Log(LogTag, "Register Allocate Map Server: [" + connectionId + "] [" + peerInfo.refId + "] [" + _allocateMapServerPeersByMapId[peerInfo.refId].Count + "]");
+                        if (!_allocateMapServerPeersByRefId.ContainsKey(peerInfo.refId))
+                            _allocateMapServerPeersByRefId.Add(peerInfo.refId, new List<CentralServerPeerInfo>());
+                        _allocateMapServerPeersByRefId[peerInfo.refId].Add(peerInfo);
+                        Logging.Log(LogTag, $"Register Allocate Map Server: [{connectionId}] [{peerInfo.refId}] [{_allocateMapServerPeersByRefId[peerInfo.refId].Count}]");
                         break;
                 }
             }
             else
             {
                 message = UITextKeys.UI_ERROR_INVALID_SERVER_HASH;
-                Logging.Log(LogTag, "Register Server Failed: [" + connectionId + "] [" + message + "]");
+                Logging.Log(LogTag, $"Register Server Failed: [{connectionId}] [{message}]");
             }
             // Response
             result.Invoke(
@@ -321,26 +321,26 @@ namespace MultiplayerARPG.MMO
                     if (_mapSpawnServerPeers.Count > 0)
                     {
                         peerInfo = _mapSpawnServerPeers.Values.First();
-                        Logging.Log(LogTag, "Request Map Spawn Address: [" + connectionId + "]");
+                        Logging.Log(LogTag, $"Request Map Spawn Address: [{connectionId}]");
                     }
                     else
                     {
                         message = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
-                        Logging.Log(LogTag, "Request Map Spawn Address: [" + connectionId + "] [" + message + "]");
+                        Logging.Log(LogTag, $"Request Map Spawn Address: [{connectionId}] [{message}]");
                     }
                     break;
                 case CentralServerPeerType.MapServer:
-                    if (!_mapServerPeersByMapId.TryGetValue(key, out peerInfo))
+                    if (!_mapServerPeersByKey.TryGetValue(key, out peerInfo))
                     {
                         message = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
-                        Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + key + "] [" + message + "]");
+                        Logging.Log(LogTag, $"Request Map Address: [{connectionId}] [{key}] [{message}]");
                     }
                     break;
                 case CentralServerPeerType.InstanceMapServer:
-                    if (!_mapServerPeersByInstanceId.TryGetValue(key, out peerInfo))
+                    if (!_instanceMapServerPeersByKey.TryGetValue(key, out peerInfo))
                     {
                         message = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
-                        Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + key + "] [" + message + "]");
+                        Logging.Log(LogTag, $"Request Map Address: [{connectionId}] [{key}] [{message}]");
                     }
                     break;
             }
@@ -593,15 +593,15 @@ namespace MultiplayerARPG.MMO
             // Generate a new instance ID, it won't being generated by map-server anymore
             request.instanceId = _centralNetworkManager.DataManager.GenerateMapSpawnInstanceId();
             // Run a map from allocated map-server collection
-            if (_allocateMapServerPeersByMapId.ContainsKey(request.mapName))
+            if (_allocateMapServerPeersByRefId.ContainsKey(request.mapName))
             {
-                List<CentralServerPeerInfo> allocatePeers = _allocateMapServerPeersByMapId[request.mapName];
+                List<CentralServerPeerInfo> allocatePeers = _allocateMapServerPeersByRefId[request.mapName];
                 for (int i = 0; i < allocatePeers.Count; ++i)
                 {
-                    AsyncResponseData<ResponseSpawnMapMessage> runResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(_allocateMapServerPeersByMapId[request.mapName][i].connectionId, MMORequestTypes.RequestRunMap, request);
+                    AsyncResponseData<ResponseSpawnMapMessage> runResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(_allocateMapServerPeersByRefId[request.mapName][i].connectionId, MMORequestTypes.RequestRunMap, request);
                     if (!runResult.IsSuccess)
                         continue;
-                    _allocateMapServerPeersByMapId[request.mapName].RemoveAt(i);
+                    _allocateMapServerPeersByRefId[request.mapName].RemoveAt(i);
                     result.Invoke(AckResponseCode.Success, runResult.Response);
                     return;
                 }
