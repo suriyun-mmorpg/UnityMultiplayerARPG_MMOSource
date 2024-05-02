@@ -19,26 +19,6 @@ namespace MultiplayerARPG.MMO
         protected readonly ConcurrentHashSet<string> _insertingCharacterNames = new ConcurrentHashSet<string>();
         protected readonly ConcurrentHashSet<string> _insertingGuildNames = new ConcurrentHashSet<string>();
 
-        private int Change(int a, int b, int min = int.MinValue, int max = int.MaxValue)
-        {
-            try
-            {
-                int result = checked(a + b);
-                if (result > max)
-                    result = max;
-                if (result < min)
-                    result = min;
-                return result;
-            }
-            catch (System.OverflowException)
-            {
-                if (b > 0)
-                    return max;
-                else
-                    return min;
-            }
-        }
-
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
@@ -82,18 +62,16 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ChangeGold(RequestHandlerData requestHandler, ChangeGoldReq request, RequestProceedResultDelegate<GoldResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            int gold = await ReadGold(request.UserId);
-            gold = Change(gold, request.ChangeAmount);
+            // Update data to database
+            int changedGold = await Database.ChangeGold(request.UserId, request.ChangeAmount);
             if (!DisableDatabaseCaching)
             {
                 // Cache the data, it will be used later
-                await DatabaseCache.SetUserGold(request.UserId, gold);
+                await DatabaseCache.SetUserGold(request.UserId, changedGold);
             }
-            // Update data to database
-            await Database.UpdateGold(request.UserId, gold);
             result.InvokeSuccess(new GoldResp()
             {
-                Gold = gold
+                Gold = changedGold,
             });
 #endif
         }
@@ -111,18 +89,16 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ChangeCash(RequestHandlerData requestHandler, ChangeCashReq request, RequestProceedResultDelegate<CashResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            int cash = await ReadCash(request.UserId);
-            cash = Change(cash, request.ChangeAmount);
+            // Update data to database
+            int changedCash = await Database.ChangeCash(request.UserId, request.ChangeAmount);
             if (!DisableDatabaseCaching)
             {
                 // Cache the data, it will be used later
-                await DatabaseCache.SetUserCash(request.UserId, cash);
+                await DatabaseCache.SetUserCash(request.UserId, changedCash);
             }
-            // Update data to database
-            await Database.UpdateCash(request.UserId, cash);
             result.InvokeSuccess(new CashResp()
             {
-                Cash = cash
+                Cash = changedCash,
             });
 #endif
         }
@@ -977,26 +953,22 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ChangeGuildGold(RequestHandlerData requestHandler, ChangeGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            GuildData guild = await ReadGuild(request.GuildId);
-            if (guild == null)
-            {
-                result.InvokeError(new GuildGoldResp()
-                {
-                    GuildGold = 0
-                });
-                return;
-            }
-            guild.gold = Change(guild.gold, request.ChangeAmount);
+            // Update data to database
+            int changedGuildGold = await Database.ChangeGuildGold(request.GuildId, request.ChangeAmount);
             if (!DisableDatabaseCaching)
             {
-                // Update to cache
-                await DatabaseCache.SetGuild(guild);
+                // Cache the data, it will be used later
+                DatabaseCacheResult<GuildData> getGuildResult = await DatabaseCache.GetGuild(request.GuildId);
+                if (getGuildResult.HasValue)
+                {
+                    GuildData guildData = getGuildResult.Value;
+                    guildData.gold = changedGuildGold;
+                    await DatabaseCache.SetGuild(guildData);
+                }
             }
-            // Update to database
-            await Database.UpdateGuildGold(request.GuildId, guild.gold);
             result.InvokeSuccess(new GuildGoldResp()
             {
-                GuildGold = guild.gold
+                GuildGold = changedGuildGold,
             });
 #endif
         }
