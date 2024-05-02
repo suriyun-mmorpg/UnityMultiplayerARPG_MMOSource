@@ -19,6 +19,26 @@ namespace MultiplayerARPG.MMO
         protected readonly ConcurrentHashSet<string> _insertingCharacterNames = new ConcurrentHashSet<string>();
         protected readonly ConcurrentHashSet<string> _insertingGuildNames = new ConcurrentHashSet<string>();
 
+        private int Change(int a, int b, int min = int.MinValue, int max = int.MaxValue)
+        {
+            try
+            {
+                int result = checked(a + b);
+                if (result > max)
+                    result = max;
+                if (result < min)
+                    result = min;
+                return result;
+            }
+            catch (System.OverflowException)
+            {
+                if (b > 0)
+                    return max;
+                else
+                    return min;
+            }
+        }
+
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
@@ -63,7 +83,7 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             int gold = await ReadGold(request.UserId);
-            gold += request.ChangeAmount;
+            gold = Change(gold, request.ChangeAmount);
             if (!DisableDatabaseCaching)
             {
                 // Cache the data, it will be used later
@@ -92,7 +112,7 @@ namespace MultiplayerARPG.MMO
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             int cash = await ReadCash(request.UserId);
-            cash += request.ChangeAmount;
+            cash = Change(cash, request.ChangeAmount);
             if (!DisableDatabaseCaching)
             {
                 // Cache the data, it will be used later
@@ -966,7 +986,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            guild.gold += request.ChangeAmount;
+            guild.gold = Change(guild.gold, request.ChangeAmount);
             if (!DisableDatabaseCaching)
             {
                 // Update to cache
@@ -1291,7 +1311,6 @@ namespace MultiplayerARPG.MMO
         }
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-
         protected async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
         {
             if (!DisableDatabaseCaching)
