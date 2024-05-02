@@ -316,7 +316,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (!ClusterServer.MapServerPeersByMapId.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(channelId, character.CurrentMapName), out CentralServerPeerInfo mapServerPeerInfo))
+            if (!ClusterServer.MapServerPeersByKey.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(channelId, character.CurrentMapName), out CentralServerPeerInfo mapServerPeerInfo))
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {
