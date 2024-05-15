@@ -715,6 +715,9 @@ namespace MultiplayerARPG.MMO
                 case AckResponseCode.Unimplemented:
                     // TODO: May tell client what is happening
                     break;
+                case AckResponseCode.Exception:
+                    // TODO: May tell client what is happening
+                    break;
             }
 #else
             await UniTask.Yield();
