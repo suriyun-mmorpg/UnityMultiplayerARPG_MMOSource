@@ -268,7 +268,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                !message.IsError() ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseAppServerRegisterMessage()
                 {
                     message = message,
@@ -346,7 +346,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                !message.IsError() ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseAppServerAddressMessage()
                 {
                     message = message,

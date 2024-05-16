@@ -253,12 +253,13 @@ namespace MultiplayerARPG.MMO
             else if (string.IsNullOrEmpty(request.mapName))
                 message = UITextKeys.UI_ERROR_EMPTY_SCENE_NAME;
 
-            if (message != UITextKeys.NONE)
+            if (message.IsError())
             {
                 result.InvokeError(new ResponseSpawnMapMessage()
                 {
                     message = message
                 });
+                return default;
             }
             SpawnMap(request, result, false);
             return default;
