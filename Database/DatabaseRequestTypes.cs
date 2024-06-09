@@ -78,5 +78,6 @@
         public const ushort RequestDeleteGuildRequest = 82;
         public const ushort RequestGetGuildRequests = 83;
         public const ushort RequestGetGuildRequestNotification = 84;
+        public const ushort RequestUpdateGuildMemberCount = 85;
     }
 }

@@ -1282,6 +1282,14 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid UpdateGuildMemberCount(RequestHandlerData requestHandler, UpdateGuildMemberCountReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            await Database.UpdateGuildMemberCount(request.GuildId, request.MaxGuildMember);
+            result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         protected async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
         {

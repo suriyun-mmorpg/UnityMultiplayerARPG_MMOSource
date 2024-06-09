@@ -198,6 +198,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<DeleteGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuildRequest, DeleteGuildRequest);
             RegisterRequestToServer<GetGuildRequestsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestGetGuildRequests, GetGuildRequests);
             RegisterRequestToServer<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(DatabaseRequestTypes.RequestGetGuildRequestNotification, GetGuildRequestNotification);
+            RegisterRequestToServer<UpdateGuildMemberCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateGuildMemberCount, UpdateGuildMemberCount);
             this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
     }

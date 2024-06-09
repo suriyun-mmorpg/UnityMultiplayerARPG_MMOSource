@@ -445,5 +445,10 @@ namespace MultiplayerARPG.MMO
         {
             return await SendRequest<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(request, GetUrl(apiUrl, DatabaseApiPath.GetGuildRequestNotification), nameof(GetGuildRequestNotificationAsync));
         }
+
+        public async UniTask<DatabaseApiResult> UpdateGuildMemberCountAsync(UpdateGuildMemberCountReq request)
+        {
+            return await SendRequest(request, DatabaseApiPath.UpdateGuildMemberCount, nameof(UpdateGuildMemberCountAsync));
+        }
     }
 }
