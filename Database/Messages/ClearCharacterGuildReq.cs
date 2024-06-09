@@ -7,13 +7,11 @@ namespace MultiplayerARPG.MMO
         public void Deserialize(NetDataReader reader)
         {
             CharacterId = reader.GetString();
-            GuildId = reader.GetInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(CharacterId);
-            writer.Put(GuildId);
         }
     }
 }
