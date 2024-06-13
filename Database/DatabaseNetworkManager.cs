@@ -100,6 +100,7 @@ namespace MultiplayerARPG.MMO
 #endif
                 seconds--;
             } while (seconds > 0);
+            await UniTask.Yield();
             ReadyToQuit = true;
             // Request to quit again
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
