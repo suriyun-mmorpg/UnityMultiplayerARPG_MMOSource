@@ -10,6 +10,13 @@ namespace MultiplayerARPG.MMO
         {
             result = defaultValue;
 
+            string envVal = Environment.GetEnvironmentVariable(configName);
+            if (!string.IsNullOrEmpty(envVal))
+            {
+                result = envVal;
+                return true;
+            }
+
             if (config == null || !config.ContainsKey(configName))
                 return false;
 
@@ -20,6 +27,12 @@ namespace MultiplayerARPG.MMO
         public static bool ReadConfigs(Dictionary<string, object> config, string configName, out int result, int defaultValue = -1)
         {
             result = defaultValue;
+
+            string envVal = Environment.GetEnvironmentVariable(configName);
+            if (!string.IsNullOrEmpty(envVal) && int.TryParse(envVal, out result))
+            {
+                return true;
+            }
 
             if (config == null || !config.ContainsKey(configName))
                 return false;
@@ -32,6 +45,12 @@ namespace MultiplayerARPG.MMO
         {
             result = defaultValue;
 
+            string envVal = Environment.GetEnvironmentVariable(configName);
+            if (!string.IsNullOrEmpty(envVal) && float.TryParse(envVal, out result))
+            {
+                return true;
+            }
+
             if (config == null || !config.ContainsKey(configName))
                 return false;
 
@@ -42,6 +61,12 @@ namespace MultiplayerARPG.MMO
         public static bool ReadConfigs(Dictionary<string, object> config, string configName, out bool result, bool defaultValue = false)
         {
             result = defaultValue;
+
+            string envVal = Environment.GetEnvironmentVariable(configName);
+            if (!string.IsNullOrEmpty(envVal) && bool.TryParse(envVal.ToLower(), out result))
+            {
+                return true;
+            }
 
             if (config == null || !config.ContainsKey(configName))
                 return false;
