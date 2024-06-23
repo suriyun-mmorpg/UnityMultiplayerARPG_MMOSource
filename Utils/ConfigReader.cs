@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         {
             result = defaultValue;
 
-            string envVal = Environment.GetEnvironmentVariable(configName);
+            string envVal = System.Environment.GetEnvironmentVariable(configName);
             if (!string.IsNullOrEmpty(envVal))
             {
                 result = envVal;
@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
         {
             result = defaultValue;
 
-            string envVal = Environment.GetEnvironmentVariable(configName);
+            string envVal = System.Environment.GetEnvironmentVariable(configName);
             if (!string.IsNullOrEmpty(envVal) && int.TryParse(envVal, out result))
             {
                 return true;
@@ -45,7 +45,7 @@ namespace MultiplayerARPG.MMO
         {
             result = defaultValue;
 
-            string envVal = Environment.GetEnvironmentVariable(configName);
+            string envVal = System.Environment.GetEnvironmentVariable(configName);
             if (!string.IsNullOrEmpty(envVal) && float.TryParse(envVal, out result))
             {
                 return true;
@@ -62,7 +62,7 @@ namespace MultiplayerARPG.MMO
         {
             result = defaultValue;
 
-            string envVal = Environment.GetEnvironmentVariable(configName);
+            string envVal = System.Environment.GetEnvironmentVariable(configName);
             if (!string.IsNullOrEmpty(envVal) && bool.TryParse(envVal.ToLower(), out result))
             {
                 return true;
