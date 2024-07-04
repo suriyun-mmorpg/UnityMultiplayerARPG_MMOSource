@@ -65,7 +65,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Get characters from server
-            DatabaseApiResult<CharactersResp> charactersResp = await DatabaseClient.ReadCharactersAsync(new ReadCharactersReq()
+            DatabaseApiResult<CharactersResp> charactersResp = await DatabaseClient.GetCharactersAsync(new GetCharactersReq()
             {
                 UserId = userPeerInfo.userId
             });
@@ -293,7 +293,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.ReadCharacterAsync(new ReadCharacterReq()
+            DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.GetCharacterAsync(new GetCharacterReq()
             {
                 UserId = userPeerInfo.userId,
                 CharacterId = request.characterId,

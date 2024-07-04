@@ -3,7 +3,7 @@
 namespace MultiplayerARPG.MMO
 {
 #nullable enable
-    public partial struct ReadSocialCharacterReq : INetSerializable
+    public partial struct GetSocialCharacterReq : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {

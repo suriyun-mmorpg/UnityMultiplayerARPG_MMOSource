@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public partial struct ReadStorageItemsResp : INetSerializable
+    public partial struct GetStorageItemsResp : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {

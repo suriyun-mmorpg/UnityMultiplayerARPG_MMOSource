@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public partial struct ReadCharactersReq : INetSerializable
+    public partial struct GetCharactersReq : INetSerializable
     {
         public void Deserialize(NetDataReader reader)
         {

@@ -21,11 +21,6 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
 #endif
         private BaseDatabase[] databaseOptions = new BaseDatabase[0];
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        [SerializeField]
-        [FormerlySerializedAs("disableCacheReading")]
-#endif
-        private bool _disableDatabaseCaching = false;
 
         public BaseDatabase Database
         {
@@ -37,12 +32,6 @@ namespace MultiplayerARPG.MMO
             {
                 database = value;
             }
-        }
-
-        public bool DisableDatabaseCaching
-        {
-            get { return _disableDatabaseCaching; }
-            set { _disableDatabaseCaching = value; }
         }
 
         public IDatabaseCache DatabaseCache
@@ -123,83 +112,83 @@ namespace MultiplayerARPG.MMO
         {
             base.RegisterMessages();
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            RegisterRequestToServer<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.RequestValidateUserLogin, ValidateUserLogin);
-            RegisterRequestToServer<ValidateAccessTokenReq, ValidateAccessTokenResp>(DatabaseRequestTypes.RequestValidateAccessToken, ValidateAccessToken);
-            RegisterRequestToServer<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.RequestGetUserLevel, GetUserLevel);
-            RegisterRequestToServer<GetGoldReq, GoldResp>(DatabaseRequestTypes.RequestGetGold, GetGold);
-            RegisterRequestToServer<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.RequestChangeGold, ChangeGold);
-            RegisterRequestToServer<GetCashReq, CashResp>(DatabaseRequestTypes.RequestGetCash, GetCash);
-            RegisterRequestToServer<ChangeCashReq, CashResp>(DatabaseRequestTypes.RequestChangeCash, ChangeCash);
-            RegisterRequestToServer<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, UpdateAccessToken);
-            RegisterRequestToServer<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, CreateUserLogin);
-            RegisterRequestToServer<FindUsernameReq, FindUsernameResp>(DatabaseRequestTypes.RequestFindUsername, FindUsername);
-            RegisterRequestToServer<CreateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestCreateCharacter, CreateCharacter);
-            RegisterRequestToServer<ReadCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestReadCharacter, ReadCharacter);
-            RegisterRequestToServer<ReadCharactersReq, CharactersResp>(DatabaseRequestTypes.RequestReadCharacters, ReadCharacters);
-            RegisterRequestToServer<UpdateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestUpdateCharacter, UpdateCharacter);
-            RegisterRequestToServer<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, DeleteCharacter);
-            RegisterRequestToServer<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.RequestFindCharacterName, FindCharacterName);
-            RegisterRequestToServer<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.RequestFindCharacters, FindCharacters);
-            RegisterRequestToServer<CreateFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateFriend, CreateFriend);
-            RegisterRequestToServer<DeleteFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteFriend, DeleteFriend);
-            RegisterRequestToServer<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, ReadFriends);
-            RegisterRequestToServer<GetFriendRequestNotificationReq, GetFriendRequestNotificationResp>(DatabaseRequestTypes.RequestGetFriendRequestNotification, GetFriendRequestNotification);
-            RegisterRequestToServer<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, CreateBuilding);
-            RegisterRequestToServer<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, UpdateBuilding);
-            RegisterRequestToServer<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, DeleteBuilding);
-            RegisterRequestToServer<ReadBuildingsReq, BuildingsResp>(DatabaseRequestTypes.RequestReadBuildings, ReadBuildings);
-            RegisterRequestToServer<CreatePartyReq, PartyResp>(DatabaseRequestTypes.RequestCreateParty, CreateParty);
-            RegisterRequestToServer<UpdatePartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateParty, UpdateParty);
-            RegisterRequestToServer<UpdatePartyLeaderReq, PartyResp>(DatabaseRequestTypes.RequestUpdatePartyLeader, UpdatePartyLeader);
-            RegisterRequestToServer<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, DeleteParty);
-            RegisterRequestToServer<UpdateCharacterPartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateCharacterParty, UpdateCharacterParty);
-            RegisterRequestToServer<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, ClearCharacterParty);
-            RegisterRequestToServer<ReadPartyReq, PartyResp>(DatabaseRequestTypes.RequestReadParty, ReadParty);
-            RegisterRequestToServer<CreateGuildReq, GuildResp>(DatabaseRequestTypes.RequestCreateGuild, CreateGuild);
-            RegisterRequestToServer<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildLeader, UpdateGuildLeader);
-            RegisterRequestToServer<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage, UpdateGuildMessage);
-            RegisterRequestToServer<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage2, UpdateGuildMessage2);
-            RegisterRequestToServer<UpdateGuildScoreReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildScore, UpdateGuildScore);
-            RegisterRequestToServer<UpdateGuildOptionsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptions, UpdateGuildOptions);
-            RegisterRequestToServer<UpdateGuildAutoAcceptRequestsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildAutoAcceptRequests, UpdateGuildAutoAcceptRequests);
-            RegisterRequestToServer<UpdateGuildRankReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRank, UpdateGuildRank);
-            RegisterRequestToServer<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, UpdateGuildRole);
-            RegisterRequestToServer<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMemberRole, UpdateGuildMemberRole);
-            RegisterRequestToServer<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, DeleteGuild);
-            RegisterRequestToServer<UpdateCharacterGuildReq, GuildResp>(DatabaseRequestTypes.RequestUpdateCharacterGuild, UpdateCharacterGuild);
-            RegisterRequestToServer<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, ClearCharacterGuild);
-            RegisterRequestToServer<FindGuildNameReq, FindGuildNameResp>(DatabaseRequestTypes.RequestFindGuildName, FindGuildName);
-            RegisterRequestToServer<ReadGuildReq, GuildResp>(DatabaseRequestTypes.RequestReadGuild, ReadGuild);
-            RegisterRequestToServer<IncreaseGuildExpReq, GuildResp>(DatabaseRequestTypes.RequestIncreaseGuildExp, IncreaseGuildExp);
-            RegisterRequestToServer<AddGuildSkillReq, GuildResp>(DatabaseRequestTypes.RequestAddGuildSkill, AddGuildSkill);
-            RegisterRequestToServer<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, GetGuildGold);
-            RegisterRequestToServer<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, ChangeGuildGold);
-            RegisterRequestToServer<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, ReadStorageItems);
-            RegisterRequestToServer<UpdateStorageItemsReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateStorageItems, UpdateStorageItems);
-            RegisterRequestToServer<EmptyMessage, EmptyMessage>(DatabaseRequestTypes.RequestDeleteAllReservedStorage, DeleteAllReservedStorage);
-            RegisterRequestToServer<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, MailList);
-            RegisterRequestToServer<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, UpdateReadMailState);
-            RegisterRequestToServer<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, UpdateClaimMailItemsState);
-            RegisterRequestToServer<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.RequestUpdateDeleteMailState, UpdateDeleteMailState);
-            RegisterRequestToServer<SendMailReq, SendMailResp>(DatabaseRequestTypes.RequestSendMail, SendMail);
-            RegisterRequestToServer<GetMailReq, GetMailResp>(DatabaseRequestTypes.RequestGetMail, GetMail);
-            RegisterRequestToServer<GetMailNotificationReq, GetMailNotificationResp>(DatabaseRequestTypes.RequestGetMailNotification, GetMailNotification);
-            RegisterRequestToServer<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetIdByCharacterName, GetIdByCharacterName);
-            RegisterRequestToServer<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetUserIdByCharacterName, GetUserIdByCharacterName);
-            RegisterRequestToServer<GetUserUnbanTimeReq, GetUserUnbanTimeResp>(DatabaseRequestTypes.RequestGetUserUnbanTime, GetUserUnbanTime);
-            RegisterRequestToServer<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetUserUnbanTimeByCharacterName, SetUserUnbanTimeByCharacterName);
-            RegisterRequestToServer<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, SetCharacterUnmuteTimeByName);
-            RegisterRequestToServer<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.RequestGetSummonBuffs, GetSummonBuffs);
-            RegisterRequestToServer<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, FindEmail);
-            RegisterRequestToServer<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, ValidateEmailVerification);
-            RegisterRequestToServer<UpdateUserCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateUserCount, UpdateUserCount);
-            RegisterRequestToServer<ReadSocialCharacterReq, SocialCharacterResp>(DatabaseRequestTypes.RequestReadSocialCharacter, ReadSocialCharacter);
-            RegisterRequestToServer<FindGuildNameReq, GuildsResp>(DatabaseRequestTypes.RequestFindGuilds, FindGuilds);
-            RegisterRequestToServer<CreateGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateGuildRequest, CreateGuildRequest);
-            RegisterRequestToServer<DeleteGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuildRequest, DeleteGuildRequest);
-            RegisterRequestToServer<GetGuildRequestsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestGetGuildRequests, GetGuildRequests);
-            RegisterRequestToServer<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(DatabaseRequestTypes.RequestGetGuildRequestNotification, GetGuildRequestNotification);
-            RegisterRequestToServer<UpdateGuildMemberCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateGuildMemberCount, UpdateGuildMemberCount);
+            RegisterRequestToServer<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.ValidateUserLogin, ValidateUserLogin);
+            RegisterRequestToServer<ValidateAccessTokenReq, ValidateAccessTokenResp>(DatabaseRequestTypes.ValidateAccessToken, ValidateAccessToken);
+            RegisterRequestToServer<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.GetUserLevel, GetUserLevel);
+            RegisterRequestToServer<GetGoldReq, GoldResp>(DatabaseRequestTypes.GetGold, GetGold);
+            RegisterRequestToServer<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.ChangeGold, ChangeGold);
+            RegisterRequestToServer<GetCashReq, CashResp>(DatabaseRequestTypes.GetCash, GetCash);
+            RegisterRequestToServer<ChangeCashReq, CashResp>(DatabaseRequestTypes.ChangeCash, ChangeCash);
+            RegisterRequestToServer<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.UpdateAccessToken, UpdateAccessToken);
+            RegisterRequestToServer<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.CreateUserLogin, CreateUserLogin);
+            RegisterRequestToServer<FindUsernameReq, FindUsernameResp>(DatabaseRequestTypes.FindUsername, FindUsername);
+            RegisterRequestToServer<CreateCharacterReq, CharacterResp>(DatabaseRequestTypes.CreateCharacter, CreateCharacter);
+            RegisterRequestToServer<GetCharacterReq, CharacterResp>(DatabaseRequestTypes.GetCharacter, GetCharacter);
+            RegisterRequestToServer<GetCharactersReq, CharactersResp>(DatabaseRequestTypes.GetCharacters, GetCharacters);
+            RegisterRequestToServer<UpdateCharacterReq, CharacterResp>(DatabaseRequestTypes.UpdateCharacter, UpdateCharacter);
+            RegisterRequestToServer<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.DeleteCharacter, DeleteCharacter);
+            RegisterRequestToServer<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.FindCharacterName, FindCharacterName);
+            RegisterRequestToServer<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.FindCharacters, FindCharacters);
+            RegisterRequestToServer<CreateFriendReq, EmptyMessage>(DatabaseRequestTypes.CreateFriend, CreateFriend);
+            RegisterRequestToServer<DeleteFriendReq, EmptyMessage>(DatabaseRequestTypes.DeleteFriend, DeleteFriend);
+            RegisterRequestToServer<GetFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.GetFriends, GetFriends);
+            RegisterRequestToServer<GetFriendRequestNotificationReq, GetFriendRequestNotificationResp>(DatabaseRequestTypes.GetFriendRequestNotification, GetFriendRequestNotification);
+            RegisterRequestToServer<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.CreateBuilding, CreateBuilding);
+            RegisterRequestToServer<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.UpdateBuilding, UpdateBuilding);
+            RegisterRequestToServer<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.DeleteBuilding, DeleteBuilding);
+            RegisterRequestToServer<GetBuildingsReq, BuildingsResp>(DatabaseRequestTypes.GetBuildings, GetBuildings);
+            RegisterRequestToServer<CreatePartyReq, PartyResp>(DatabaseRequestTypes.CreateParty, CreateParty);
+            RegisterRequestToServer<UpdatePartyReq, PartyResp>(DatabaseRequestTypes.UpdateParty, UpdateParty);
+            RegisterRequestToServer<UpdatePartyLeaderReq, PartyResp>(DatabaseRequestTypes.UpdatePartyLeader, UpdatePartyLeader);
+            RegisterRequestToServer<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.DeleteParty, DeleteParty);
+            RegisterRequestToServer<UpdateCharacterPartyReq, PartyResp>(DatabaseRequestTypes.UpdateCharacterParty, UpdateCharacterParty);
+            RegisterRequestToServer<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.ClearCharacterParty, ClearCharacterParty);
+            RegisterRequestToServer<GetPartyReq, PartyResp>(DatabaseRequestTypes.GetParty, GetParty);
+            RegisterRequestToServer<CreateGuildReq, GuildResp>(DatabaseRequestTypes.CreateGuild, CreateGuild);
+            RegisterRequestToServer<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.UpdateGuildLeader, UpdateGuildLeader);
+            RegisterRequestToServer<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.UpdateGuildMessage, UpdateGuildMessage);
+            RegisterRequestToServer<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.UpdateGuildMessage2, UpdateGuildMessage2);
+            RegisterRequestToServer<UpdateGuildScoreReq, GuildResp>(DatabaseRequestTypes.UpdateGuildScore, UpdateGuildScore);
+            RegisterRequestToServer<UpdateGuildOptionsReq, GuildResp>(DatabaseRequestTypes.UpdateGuildOptions, UpdateGuildOptions);
+            RegisterRequestToServer<UpdateGuildAutoAcceptRequestsReq, GuildResp>(DatabaseRequestTypes.UpdateGuildAutoAcceptRequests, UpdateGuildAutoAcceptRequests);
+            RegisterRequestToServer<UpdateGuildRankReq, GuildResp>(DatabaseRequestTypes.UpdateGuildRank, UpdateGuildRank);
+            RegisterRequestToServer<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.UpdateGuildRole, UpdateGuildRole);
+            RegisterRequestToServer<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.UpdateGuildMemberRole, UpdateGuildMemberRole);
+            RegisterRequestToServer<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.DeleteGuild, DeleteGuild);
+            RegisterRequestToServer<UpdateCharacterGuildReq, GuildResp>(DatabaseRequestTypes.UpdateCharacterGuild, UpdateCharacterGuild);
+            RegisterRequestToServer<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.ClearCharacterGuild, ClearCharacterGuild);
+            RegisterRequestToServer<FindGuildNameReq, FindGuildNameResp>(DatabaseRequestTypes.FindGuildName, FindGuildName);
+            RegisterRequestToServer<GetGuildReq, GuildResp>(DatabaseRequestTypes.GetGuild, GetGuild);
+            RegisterRequestToServer<IncreaseGuildExpReq, GuildResp>(DatabaseRequestTypes.IncreaseGuildExp, IncreaseGuildExp);
+            RegisterRequestToServer<AddGuildSkillReq, GuildResp>(DatabaseRequestTypes.AddGuildSkill, AddGuildSkill);
+            RegisterRequestToServer<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.GetGuildGold, GetGuildGold);
+            RegisterRequestToServer<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.ChangeGuildGold, ChangeGuildGold);
+            RegisterRequestToServer<GetStorageItemsReq, GetStorageItemsResp>(DatabaseRequestTypes.GetStorageItems, GetStorageItems);
+            RegisterRequestToServer<UpdateStorageItemsReq, EmptyMessage>(DatabaseRequestTypes.UpdateStorageItems, UpdateStorageItems);
+            RegisterRequestToServer<EmptyMessage, EmptyMessage>(DatabaseRequestTypes.DeleteAllReservedStorage, DeleteAllReservedStorage);
+            RegisterRequestToServer<MailListReq, MailListResp>(DatabaseRequestTypes.MailList, MailList);
+            RegisterRequestToServer<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.UpdateReadMailState, UpdateReadMailState);
+            RegisterRequestToServer<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.UpdateClaimMailItemsState, UpdateClaimMailItemsState);
+            RegisterRequestToServer<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.UpdateDeleteMailState, UpdateDeleteMailState);
+            RegisterRequestToServer<SendMailReq, SendMailResp>(DatabaseRequestTypes.SendMail, SendMail);
+            RegisterRequestToServer<GetMailReq, GetMailResp>(DatabaseRequestTypes.GetMail, GetMail);
+            RegisterRequestToServer<GetMailNotificationReq, GetMailNotificationResp>(DatabaseRequestTypes.GetMailNotification, GetMailNotification);
+            RegisterRequestToServer<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.GetIdByCharacterName, GetIdByCharacterName);
+            RegisterRequestToServer<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.GetUserIdByCharacterName, GetUserIdByCharacterName);
+            RegisterRequestToServer<GetUserUnbanTimeReq, GetUserUnbanTimeResp>(DatabaseRequestTypes.GetUserUnbanTime, GetUserUnbanTime);
+            RegisterRequestToServer<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.SetUserUnbanTimeByCharacterName, SetUserUnbanTimeByCharacterName);
+            RegisterRequestToServer<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.SetCharacterUnmuteTimeByName, SetCharacterUnmuteTimeByName);
+            RegisterRequestToServer<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.GetSummonBuffs, GetSummonBuffs);
+            RegisterRequestToServer<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.FindEmail, FindEmail);
+            RegisterRequestToServer<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.ValidateEmailVerification, ValidateEmailVerification);
+            RegisterRequestToServer<UpdateUserCountReq, EmptyMessage>(DatabaseRequestTypes.UpdateUserCount, UpdateUserCount);
+            RegisterRequestToServer<GetSocialCharacterReq, SocialCharacterResp>(DatabaseRequestTypes.GetSocialCharacter, GetSocialCharacter);
+            RegisterRequestToServer<FindGuildNameReq, GuildsResp>(DatabaseRequestTypes.FindGuilds, FindGuilds);
+            RegisterRequestToServer<CreateGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.CreateGuildRequest, CreateGuildRequest);
+            RegisterRequestToServer<DeleteGuildRequestReq, EmptyMessage>(DatabaseRequestTypes.DeleteGuildRequest, DeleteGuildRequest);
+            RegisterRequestToServer<GetGuildRequestsReq, SocialCharactersResp>(DatabaseRequestTypes.GetGuildRequests, GetGuildRequests);
+            RegisterRequestToServer<GetGuildRequestNotificationReq, GetGuildRequestNotificationResp>(DatabaseRequestTypes.GetGuildRequestNotification, GetGuildRequestNotification);
+            RegisterRequestToServer<UpdateGuildMemberCountReq, EmptyMessage>(DatabaseRequestTypes.UpdateGuildMemberCount, UpdateGuildMemberCount);
             this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
     }
