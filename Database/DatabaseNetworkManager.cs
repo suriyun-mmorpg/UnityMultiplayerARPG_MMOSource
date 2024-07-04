@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using LiteNetLibManager;
+using Cysharp.Threading.Tasks;
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
 using UnityEngine;
 using UnityEngine.Serialization;
-using Cysharp.Threading.Tasks;
 #endif
 
 namespace MultiplayerARPG.MMO
