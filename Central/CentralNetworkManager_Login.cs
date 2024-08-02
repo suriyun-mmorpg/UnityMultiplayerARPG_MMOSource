@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         public bool RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestUserLogin, new RequestUserLoginMessage()
+            return ClientSendRequest(MMORequestTypes.UserLogin, new RequestUserLoginMessage()
             {
                 username = username,
                 password = password,
@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestUserRegister(string username, string password, string email, ResponseDelegate<ResponseUserRegisterMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestUserRegister, new RequestUserRegisterMessage()
+            return ClientSendRequest(MMORequestTypes.UserRegister, new RequestUserRegisterMessage()
             {
                 username = username,
                 password = password,
@@ -28,12 +28,12 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestUserLogout(ResponseDelegate<INetSerializable> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestUserLogout, EmptyMessage.Value, responseDelegate: callback);
+            return ClientSendRequest(MMORequestTypes.UserLogout, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestValidateAccessToken, new RequestValidateAccessTokenMessage()
+            return ClientSendRequest(MMORequestTypes.ValidateAccessToken, new RequestValidateAccessTokenMessage()
             {
                 userId = userId,
                 accessToken = accessToken,
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestChannels(ResponseDelegate<ResponseChannelsMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestChannels, EmptyMessage.Value, responseDelegate: callback);
+            return ClientSendRequest(MMORequestTypes.Channels, EmptyMessage.Value, responseDelegate: callback);
         }
 
         protected async UniTaskVoid HandleRequestUserLogin(

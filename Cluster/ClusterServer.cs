@@ -67,11 +67,11 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             // Generic
-            RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
-            RegisterRequestHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
+            RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.AppServerRegister, HandleRequestAppServerRegister);
+            RegisterRequestHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.AppServerAddress, HandleRequestAppServerAddress);
             // Map
-            RegisterResponseHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter);
-            RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestRunMap);
+            RegisterResponseHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.ForceDespawnCharacter);
+            RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RunMap);
             RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -79,9 +79,9 @@ namespace MultiplayerARPG.MMO
             RegisterMessageHandler(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMember);
             RegisterMessageHandler(MMOMessageTypes.UpdateGuild, HandleUpdateGuild);
             // Map-spawn
-            RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
-            RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
-            RegisterRequestHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount, HandleRequestUserCount);
+            RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap, HandleRequestSpawnMap);
+            RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap);
+            RegisterRequestHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.UserCount, HandleRequestUserCount);
 #endif
         }
 
@@ -566,7 +566,7 @@ namespace MultiplayerARPG.MMO
         public async UniTask RequestSpawnMap(long mapSpawnConnectionId, RequestSpawnMapMessage request, string key, RequestProceedResultDelegate<ResponseSpawnMapMessage> resultForMapServer)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            AsyncResponseData<ResponseSpawnMapMessage> spawnResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(mapSpawnConnectionId, MMORequestTypes.RequestSpawnMap, request, _centralNetworkManager.mapSpawnMillisecondsTimeout);
+            AsyncResponseData<ResponseSpawnMapMessage> spawnResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(mapSpawnConnectionId, MMORequestTypes.SpawnMap, request, _centralNetworkManager.mapSpawnMillisecondsTimeout);
             if (!spawnResult.IsSuccess)
             {
                 // Send error to map-server immediately
@@ -598,7 +598,7 @@ namespace MultiplayerARPG.MMO
                 List<CentralServerPeerInfo> allocatePeers = _allocateMapServerPeersByRefId[request.mapName];
                 for (int i = 0; i < allocatePeers.Count; ++i)
                 {
-                    AsyncResponseData<ResponseSpawnMapMessage> runResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(_allocateMapServerPeersByRefId[request.mapName][i].connectionId, MMORequestTypes.RequestRunMap, request);
+                    AsyncResponseData<ResponseSpawnMapMessage> runResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(_allocateMapServerPeersByRefId[request.mapName][i].connectionId, MMORequestTypes.RunMap, request);
                     if (!runResult.IsSuccess)
                         continue;
                     _allocateMapServerPeersByRefId[request.mapName].RemoveAt(i);
@@ -696,7 +696,7 @@ namespace MultiplayerARPG.MMO
                 // No map-server peer, it may be disconnected, so determine that it is despawned
                 return true;
             }
-            AsyncResponseData<EmptyMessage> result = await SendRequestAsync<RequestForceDespawnCharacterMessage, EmptyMessage>(connectionId, MMORequestTypes.RequestForceDespawnCharacter, new RequestForceDespawnCharacterMessage()
+            AsyncResponseData<EmptyMessage> result = await SendRequestAsync<RequestForceDespawnCharacterMessage, EmptyMessage>(connectionId, MMORequestTypes.ForceDespawnCharacter, new RequestForceDespawnCharacterMessage()
             {
                 characterId = characterId,
             });

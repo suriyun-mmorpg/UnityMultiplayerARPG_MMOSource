@@ -2,20 +2,20 @@
 {
     public static partial class MMORequestTypes
     {
-        public const ushort RequestAppServerRegister = 0;
-        public const ushort RequestAppServerAddress = 1;
-        public const ushort RequestUserLogin = 2;
-        public const ushort RequestUserRegister = 3;
-        public const ushort RequestUserLogout = 4;
-        public const ushort RequestCharacters = 5;
-        public const ushort RequestCreateCharacter = 6;
-        public const ushort RequestDeleteCharacter = 7;
-        public const ushort RequestSelectCharacter = 8;
-        public const ushort RequestSpawnMap = 9;
-        public const ushort RequestValidateAccessToken = 10;
-        public const ushort RequestUserCount = 11;
-        public const ushort RequestChannels = 12;
-        public const ushort RequestForceDespawnCharacter = 13;
-        public const ushort RequestRunMap = 14;
+        public const ushort AppServerRegister = 0;
+        public const ushort AppServerAddress = 1;
+        public const ushort UserLogin = 2;
+        public const ushort UserRegister = 3;
+        public const ushort UserLogout = 4;
+        public const ushort Characters = 5;
+        public const ushort CreateCharacter = 6;
+        public const ushort DeleteCharacter = 7;
+        public const ushort SelectCharacter = 8;
+        public const ushort SpawnMap = 9;
+        public const ushort ValidateAccessToken = 10;
+        public const ushort UserCount = 11;
+        public const ushort Channels = 12;
+        public const ushort ForceDespawnCharacter = 13;
+        public const ushort RunMap = 14;
     }
 }

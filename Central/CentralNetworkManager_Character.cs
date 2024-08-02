@@ -10,12 +10,12 @@ namespace MultiplayerARPG.MMO
     {
         public bool RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestCharacters, EmptyMessage.Value, responseDelegate: callback);
+            return ClientSendRequest(MMORequestTypes.Characters, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate<ResponseCreateCharacterMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestCreateCharacter, new RequestCreateCharacterMessage()
+            return ClientSendRequest(MMORequestTypes.CreateCharacter, new RequestCreateCharacterMessage()
             {
                 characterName = characterData.CharacterName,
                 dataId = characterData.DataId,
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestDeleteCharacter(string characterId, ResponseDelegate<ResponseDeleteCharacterMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestDeleteCharacter, new RequestDeleteCharacterMessage()
+            return ClientSendRequest(MMORequestTypes.DeleteCharacter, new RequestDeleteCharacterMessage()
             {
                 characterId = characterId,
             }, responseDelegate: callback);
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestSelectCharacter(string channelId, string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestSelectCharacter, new RequestSelectCharacterMessage()
+            return ClientSendRequest(MMORequestTypes.SelectCharacter, new RequestSelectCharacterMessage()
             {
                 channelId = channelId,
                 characterId = characterId,

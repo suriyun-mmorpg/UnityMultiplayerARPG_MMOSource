@@ -27,9 +27,9 @@ namespace MultiplayerARPG.MMO
             _appServer = appServer;
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
-            RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
-            RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount);
+            RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.AppServerRegister, HandleResponseAppServerRegister);
+            RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.AppServerAddress, HandleResponseAppServerAddress);
+            RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.UserCount);
             RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
             RegisterMessageHandler(MMOMessageTypes.KickUser, HandleKickUser);
             RegisterMessageHandler(MMOMessageTypes.PlayerCharacterRemoved, HandlePlayerCharacterRemoved);
@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
         public ClusterClient(MapSpawnNetworkManager mapSpawnNetworkManager) : this(mapSpawnNetworkManager as IAppServer)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, mapSpawnNetworkManager.HandleRequestSpawnMap);
+            RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap, mapSpawnNetworkManager.HandleRequestSpawnMap);
 #endif
         }
 
@@ -146,7 +146,7 @@ namespace MultiplayerARPG.MMO
         public bool RequestAppServerRegister(CentralServerPeerInfo peerInfo)
         {
             Logging.Log(LogTag, "App Register is requesting");
-            return SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
+            return SendRequest(MMORequestTypes.AppServerRegister, new RequestAppServerRegisterMessage()
             {
                 peerInfo = peerInfo,
             });
@@ -173,7 +173,7 @@ namespace MultiplayerARPG.MMO
         public bool RequestAppServerAddress(CentralServerPeerType peerType, string channelId, string refId)
         {
             Logging.Log(LogTag, "App Address is requesting");
-            return SendRequest(MMORequestTypes.RequestAppServerAddress, new RequestAppServerAddressMessage()
+            return SendRequest(MMORequestTypes.AppServerAddress, new RequestAppServerAddressMessage()
             {
                 peerType = peerType,
                 channelId = channelId,
