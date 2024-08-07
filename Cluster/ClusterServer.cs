@@ -372,8 +372,6 @@ namespace MultiplayerARPG.MMO
                     SendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
                     {
                         writer.PutValue(message);
-                        writer.Put(messageHandler.Reader.GetString()); // User ID
-                        writer.Put(messageHandler.Reader.GetString()); // Access Token
                     });
                     break;
                 case ChatChannel.Whisper:
