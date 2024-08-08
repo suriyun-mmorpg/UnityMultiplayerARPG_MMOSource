@@ -150,6 +150,8 @@ namespace MultiplayerARPG.MMO
                 result.AddRange(text.Split('|'));
                 return true;
             }
+            if (defaultValue != null)
+                result.AddRange(defaultValue);
             return false;
         }
 
