@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using ConcurrentCollections;
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
 using UnityEngine;
+using UnityEngine.Serialization;
 #endif
 
 namespace MultiplayerARPG.MMO
@@ -34,12 +35,17 @@ namespace MultiplayerARPG.MMO
 #endif
         public string clusterServerAddress = "127.0.0.1";
         public int clusterServerPort = 6010;
-        public string machineAddress = "127.0.0.1";
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         [Header("Map Spawn Settings")]
+        [FormerlySerializedAs("machineAddress")]
 #endif
-        public string exePath = "./Build.exe";
+        public string publicAddress = "127.0.0.1";
+
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        [FormerlySerializedAs("exePath")]
+#endif
+        public string spawnExePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
         public string batchModeArguments = "-batchmode -nographics";
@@ -87,7 +93,7 @@ namespace MultiplayerARPG.MMO
                 if (Application.isEditor && isOverrideExePath)
                     return overrideExePath;
 #endif
-                return exePath;
+                return spawnExePath;
             }
         }
 
@@ -108,7 +114,7 @@ namespace MultiplayerARPG.MMO
 #endif
         public string ClusterServerAddress { get { return clusterServerAddress; } }
         public int ClusterServerPort { get { return clusterServerPort; } }
-        public string AppAddress { get { return machineAddress; } }
+        public string AppAddress { get { return publicAddress; } }
         public int AppPort { get { return networkPort; } }
         public string ChannelId { get { return string.Empty; } }
         public string RefId { get { return string.Empty; } }
@@ -408,7 +414,7 @@ namespace MultiplayerARPG.MMO
                         : string.Empty) +
                     $" {ProcessArguments.ARG_CENTRAL_ADDRESS} {clusterServerAddress}" +
                     $" {ProcessArguments.ARG_CENTRAL_PORT} {clusterServerPort}" +
-                    $" {ProcessArguments.ARG_MACHINE_ADDRESS} {machineAddress}" +
+                    $" {ProcessArguments.ARG_PUBLIC_ADDRESS} {publicAddress}" +
                     $" {ProcessArguments.ARG_MAP_PORT} {port}" +
                     $" {ProcessArguments.ARG_START_MAP_SERVER}",
             };

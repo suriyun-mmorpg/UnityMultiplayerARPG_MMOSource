@@ -28,8 +28,15 @@ namespace MultiplayerARPG.MMO
         // Cluster server
         public const string CONFIG_CLUSTER_PORT = "clusterPort";
         public const string ARG_CLUSTER_PORT = "-" + CONFIG_CLUSTER_PORT;
+
+        [System.Obsolete("Use `CONFIG_PUBLIC_ADDRESS` instead.")]
         public const string CONFIG_MACHINE_ADDRESS = "machineAddress";
+        [System.Obsolete("Use `ARG_PUBLIC_ADDRESS` instead.")]
         public const string ARG_MACHINE_ADDRESS = "-" + CONFIG_MACHINE_ADDRESS;
+
+        public const string CONFIG_PUBLIC_ADDRESS = "publicAddress";
+        public const string ARG_PUBLIC_ADDRESS = "-" + CONFIG_PUBLIC_ADDRESS;
+
         // Map spawn server
         public const string CONFIG_MAP_SPAWN_PORT = "mapSpawnPort";
         public const string ARG_MAP_SPAWN_PORT = "-" + CONFIG_MAP_SPAWN_PORT;
