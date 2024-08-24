@@ -147,7 +147,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Generate new access token
-            accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
+            accessToken = DataManager.GenerateAccessToken(userId);
             DatabaseApiResult updateAccessTokenResp = await DatabaseClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userId,
