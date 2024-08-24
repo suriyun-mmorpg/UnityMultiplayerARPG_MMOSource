@@ -3,7 +3,6 @@ using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
 using UnityEngine;
-using UnityEngine.Serialization;
 #endif
 
 namespace MultiplayerARPG.MMO

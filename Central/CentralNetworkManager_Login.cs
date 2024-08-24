@@ -151,7 +151,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult updateAccessTokenResp = await DatabaseClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userId,
-                AccessToken = accessToken
+                AccessToken = accessToken,
             });
             if (!updateAccessTokenResp.IsSuccess)
             {
