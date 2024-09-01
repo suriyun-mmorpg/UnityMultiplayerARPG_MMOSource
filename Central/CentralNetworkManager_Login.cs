@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
             RequestUserLoginMessage request,
             RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (disableDefaultLogin)
             {
                 result.InvokeError(new ResponseUserLoginMessage()
@@ -184,7 +184,7 @@ namespace MultiplayerARPG.MMO
             RequestUserRegisterMessage request,
             RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (disableDefaultLogin)
             {
                 result.InvokeError(new ResponseUserRegisterMessage()
@@ -303,7 +303,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (RemoveUserPeerByConnectionId(requestHandler.ConnectionId, out CentralUserPeerInfo userPeerInfo))
             {
                 // Clear access token
@@ -328,7 +328,7 @@ namespace MultiplayerARPG.MMO
             RequestValidateAccessTokenMessage request,
             RequestProceedResultDelegate<ResponseValidateAccessTokenMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             long connectionId = requestHandler.ConnectionId;
             string userId = request.userId;
             string accessToken = request.accessToken;
@@ -400,7 +400,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseChannelsMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             // Response
             result.InvokeSuccess(new ResponseChannelsMessage()
             {

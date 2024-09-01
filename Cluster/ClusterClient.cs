@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     public class ClusterClient : LiteNetLibClient
     {
         public override string LogTag { get { return nameof(ClusterClient) + ":" + _appServer.PeerType; } }
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public delegate void OnResponseAppServerRegister(AckResponseCode responseCode);
         public OnResponseAppServerRegister onResponseAppServerRegister;
         public delegate void OnResponseAppServerAddress(AckResponseCode responseCode, CentralServerPeerInfo peerInfo);
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
         public ClusterClient(IAppServer appServer) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
         {
             _appServer = appServer;
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.AppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.AppServerAddress, HandleResponseAppServerAddress);
@@ -38,14 +38,14 @@ namespace MultiplayerARPG.MMO
 
         public ClusterClient(MapSpawnNetworkManager mapSpawnNetworkManager) : this(mapSpawnNetworkManager as IAppServer)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap, mapSpawnNetworkManager.HandleRequestSpawnMap);
 #endif
         }
 
         public override void OnClientReceive(TransportEventData eventData)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             switch (eventData.type)
             {
                 case ENetworkEvent.ConnectEvent:
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnAppStart()
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             Logging.Log(LogTag, "Starting server");
             ConnectToClusterServer();
 #endif
@@ -77,13 +77,13 @@ namespace MultiplayerARPG.MMO
 
         public void OnAppStop()
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             Logging.Log(LogTag, "Stopping server");
             DisconnectFromClusterServer();
 #endif
         }
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void ConnectToClusterServer()
         {
             Logging.Log(LogTag, "Connecting to Cluster Server: " + _appServer.ClusterServerAddress + ":" + _appServer.ClusterServerPort);
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void DisconnectFromClusterServer()
         {
             Logging.Log(LogTag, "Disconnecting from Cluster Server");
@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void OnConnectedToClusterServer()
         {
             Logging.Log(LogTag, "Connected to Cluster Server");
@@ -115,7 +115,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private async UniTaskVoid OnDisconnectedFromClusterServer()
         {
             Logging.Log(LogTag, "Disconnected from Central Server");
@@ -142,7 +142,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public bool RequestAppServerRegister(CentralServerPeerInfo peerInfo)
         {
             Logging.Log(LogTag, "App Register is requesting");
@@ -153,7 +153,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleResponseAppServerRegister(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public bool RequestAppServerAddress(CentralServerPeerType peerType, string channelId, string refId)
         {
             Logging.Log(LogTag, "App Address is requesting");
@@ -182,7 +182,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleResponseAppServerAddress(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
@@ -193,7 +193,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleResponseUserCount(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
@@ -204,7 +204,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleAppServerAddress(MessageHandlerData messageHandler)
         {
             ResponseAppServerAddressMessage response = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
@@ -213,7 +213,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandlePlayerCharacterRemoved(MessageHandlerData messageHandler)
         {
             string userId = messageHandler.Reader.GetString();
@@ -223,7 +223,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleKickUser(MessageHandlerData messageHandler)
         {
             string kickUserId = messageHandler.Reader.GetString();

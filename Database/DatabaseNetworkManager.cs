@@ -1,22 +1,22 @@
 ﻿using System.Linq;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
 using UnityEngine;
 #endif
 
 namespace MultiplayerARPG.MMO
 {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
     [DefaultExecutionOrder(DefaultExecutionOrders.DATABASE_NETWORK_MANAGER)]
 #endif
     public partial class DatabaseNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         [SerializeField]
 #endif
         private BaseDatabase database = null;
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         [SerializeField]
 #endif
         private BaseDatabase[] databaseOptions = new BaseDatabase[0];
@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         protected override void Start()
         {
             Initialize();
@@ -81,7 +81,7 @@ namespace MultiplayerARPG.MMO
             do
             {
                 Logging.Log($"[DatabaseNetworkManager] {seconds} seconds before quit.");
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
                 await UniTask.Delay(1000);
 #elif NET || NETCOREAPP
                 await Task.Delay(1000);
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
             await UniTask.Yield();
             ReadyToQuit = true;
             // Request to quit again
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             Application.Quit();
 #endif
         }
@@ -99,10 +99,10 @@ namespace MultiplayerARPG.MMO
         public override async void OnStartServer()
         {
             base.OnStartServer();
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             Database.Initialize();
 #endif
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             await Database.DoMigration();
 #endif
         }

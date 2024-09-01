@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
         public override string LogTag { get { return nameof(ClusterServer); } }
 
         private readonly CentralNetworkManager _centralNetworkManager;
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private Dictionary<string, SocialCharacterData> _mapUsersByCharacterId = new Dictionary<string, SocialCharacterData>();
         public IReadOnlyDictionary<string, SocialCharacterData> MapUsersByCharacterId => _mapUsersByCharacterId;
 
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
         public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
         {
             _centralNetworkManager = centralNetworkManager;
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             // Generic
             RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.AppServerRegister, HandleRequestAppServerRegister);
@@ -85,14 +85,14 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public bool StartServer()
         {
             return StartServer(_centralNetworkManager.clusterServerPort, int.MaxValue);
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         protected override void OnStopServer()
         {
             base.OnStopServer();
@@ -108,7 +108,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public override void OnServerReceive(TransportEventData eventData)
         {
             CentralServerPeerInfo tempPeerInfo;
@@ -144,7 +144,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void RemoveAllocateMapServer(long connectionId)
         {
             List<string> keys = new List<string>(_allocateMapServerPeersByRefId.Keys);
@@ -163,7 +163,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void RemoveMapUsers(long connectionId)
         {
             List<KeyValuePair<string, SocialCharacterData>> mapUsers = _mapUsersByCharacterId.ToList();
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private UniTaskVoid HandleRequestAppServerRegister(
             RequestHandlerData requestHandler,
             RequestAppServerRegisterMessage request,
@@ -277,7 +277,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         /// <summary>
         /// This function will be used to send connection information to connected map servers and cluster servers
         /// </summary>
@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private UniTaskVoid HandleRequestAppServerAddress(
             RequestHandlerData requestHandler,
             RequestAppServerAddressMessage request,
@@ -356,7 +356,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleChat(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -387,7 +387,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void HandleUpdateMapUser(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -426,7 +426,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -441,7 +441,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void HandleUpdateParty(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -456,7 +456,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -471,7 +471,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void HandleUpdateGuild(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -486,7 +486,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData, long exceptConnectionId)
         {
             foreach (long mapServerConnectionId in _mapServerPeers.Keys)
@@ -499,7 +499,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
         {
             UpdateUserCharacterMessage message = new UpdateUserCharacterMessage();
@@ -509,7 +509,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void PlayerCharacterRemoved(string userId, string characterId)
         {
             List<long> mapServerPeerConnectionIds = new List<long>(_mapServerPeers.Keys);
@@ -529,7 +529,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void KickUser(string userId, UITextKeys message)
         {
             List<long> mapServerPeerConnectionIds = new List<long>(_mapServerPeers.Keys);
@@ -551,7 +551,7 @@ namespace MultiplayerARPG.MMO
 
         public bool MapContainsUser(string userId)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             foreach (SocialCharacterData mapUser in _mapUsersByCharacterId.Values)
             {
                 if (mapUser.userId.Equals(userId))
@@ -563,7 +563,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask RequestSpawnMap(long mapSpawnConnectionId, RequestSpawnMapMessage request, string key, RequestProceedResultDelegate<ResponseSpawnMapMessage> resultForMapServer)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             AsyncResponseData<ResponseSpawnMapMessage> spawnResult = await SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(mapSpawnConnectionId, MMORequestTypes.SpawnMap, request, _centralNetworkManager.mapSpawnMillisecondsTimeout);
             if (!spawnResult.IsSuccess)
             {
@@ -587,7 +587,7 @@ namespace MultiplayerARPG.MMO
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             // Generate a new instance ID, it won't being generated by map-server anymore
             request.instanceId = _centralNetworkManager.DataManager.GenerateMapSpawnInstanceId();
             // Run a map from allocated map-server collection
@@ -624,7 +624,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseUserCountMessage> result)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new ResponseUserCountMessage()
             {
                 userCount = _mapUsersByCharacterId.Count,
@@ -635,7 +635,7 @@ namespace MultiplayerARPG.MMO
 
         public List<ChannelEntry> GetChannels()
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             Dictionary<string, int> connectionCounts = new Dictionary<string, int>();
             foreach (long connectionId in ConnectionIdsByCharacterId.Values)
             {
@@ -665,7 +665,7 @@ namespace MultiplayerARPG.MMO
 
         public int GetChannelConnections(string channelId)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             int connections = 0;
             foreach (long connectionId in ConnectionIdsByCharacterId.Values)
             {
@@ -683,7 +683,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask<bool> ConfirmDespawnCharacter(string characterId)
         {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             if (!_connectionIdsByDespawningCharacterId.TryGetValue(characterId, out long connectionId))
             {
                 // No despawning character, so it may not played by player or already despawned
