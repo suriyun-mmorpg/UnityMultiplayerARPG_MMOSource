@@ -21,9 +21,11 @@ namespace MultiplayerARPG.MMO
                 dataId = characterData.DataId,
                 entityId = characterData.EntityId,
                 factionId = characterData.FactionId,
+#if !DISABLE_CUSTOM_CHARACTER_DATA
                 publicBools = characterData.PublicBools,
                 publicInts = characterData.PublicInts,
                 publicFloats = characterData.PublicFloats,
+#endif
             }, callback, extraRequestSerializer: (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
