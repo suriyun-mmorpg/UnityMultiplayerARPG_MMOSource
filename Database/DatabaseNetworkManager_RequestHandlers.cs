@@ -176,7 +176,7 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
-                Database.UpdateCharacter(request.CharacterData, request.SummonBuffs, request.StorageItems, request.DeleteStorageReservation),
+                Database.UpdateCharacter(request.State, request.CharacterData, request.SummonBuffs, request.StorageItems, request.DeleteStorageReservation),
             };
             tasks.Add(DatabaseCache.SetPlayerCharacter(request.CharacterData));
             tasks.Add(DatabaseCache.SetSummonBuffs(request.CharacterData.Id, request.SummonBuffs));
