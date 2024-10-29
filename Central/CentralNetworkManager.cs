@@ -156,7 +156,7 @@ namespace MultiplayerARPG.MMO
             // Update user count
             await DatabaseClient.UpdateUserCount(new UpdateUserCountReq()
             {
-                UserCount = ClusterServer.MapUsersByCharacterId.Count,
+                UserCount = ClusterServer.CountUsers(),
             });
         }
 #endif
@@ -310,11 +310,12 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public bool MapContainsUser(string userId)
+        public async UniTask<bool> MapContainsUser(string userId)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            return ClusterServer.MapContainsUser(userId);
+            return await ClusterServer.MapContainsUser(userId);
 #else
+            await UniTask.Yield();
             return false;
 #endif
         }

@@ -14,5 +14,6 @@
         public const ushort KickUser = 10;
         public const ushort PlayerCharacterRemoved = 11;
         public const ushort Disconnect = 12;
+        public const ushort UpdateUserCount = 13;
     }
 }

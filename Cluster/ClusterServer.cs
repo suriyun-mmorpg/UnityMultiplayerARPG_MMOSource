@@ -15,19 +15,6 @@ namespace MultiplayerARPG.MMO
 
         private readonly CentralNetworkManager _centralNetworkManager;
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-        private Dictionary<string, SocialCharacterData> _mapUsersByCharacterId = new Dictionary<string, SocialCharacterData>();
-        public IReadOnlyDictionary<string, SocialCharacterData> MapUsersByCharacterId => _mapUsersByCharacterId;
-
-
-        private Dictionary<string, long> _connectionIdsByCharacterId = new Dictionary<string, long>();
-        public IReadOnlyDictionary<string, long> ConnectionIdsByCharacterId => _connectionIdsByCharacterId;
-
-        private Dictionary<string, long> _connectionIdsByCharacterName = new Dictionary<string, long>();
-        public IReadOnlyDictionary<string, long> ConnectionIdsByCharacterName => _connectionIdsByCharacterName;
-
-        private Dictionary<string, long> _connectionIdsByDespawningCharacterId = new Dictionary<string, long>();
-        public IReadOnlyDictionary<string, long> ConnectionIdsByDespawningCharacterId => _connectionIdsByDespawningCharacterId;
-
         // Map spawn server peers
         private Dictionary<long, CentralServerPeerInfo> _mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public IReadOnlyDictionary<long, CentralServerPeerInfo> MapSpawnServerPeers => _mapSpawnServerPeers;
@@ -72,12 +59,14 @@ namespace MultiplayerARPG.MMO
             // Map
             RegisterResponseHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.ForceDespawnCharacter);
             RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RunMap);
+            RegisterResponseHandler<RequestFindOnlineUserMessage, ResponseFindOnlineUserMessage>(MMORequestTypes.FindOnlineUser);
             RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
             RegisterMessageHandler(MMOMessageTypes.UpdateParty, HandleUpdateParty);
             RegisterMessageHandler(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMember);
             RegisterMessageHandler(MMOMessageTypes.UpdateGuild, HandleUpdateGuild);
+            RegisterMessageHandler(MMOMessageTypes.UpdateUserCount, HandleUpdateUserCount);
             // Map-spawn
             RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap, HandleRequestSpawnMap);
             RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap);
@@ -96,10 +85,6 @@ namespace MultiplayerARPG.MMO
         protected override void OnStopServer()
         {
             base.OnStopServer();
-            _mapUsersByCharacterId.Clear();
-            _connectionIdsByCharacterId.Clear();
-            _connectionIdsByCharacterName.Clear();
-            _connectionIdsByDespawningCharacterId.Clear();
             _mapSpawnServerPeers.Clear();
             _mapServerPeers.Clear();
             _mapServerPeersByKey.Clear();
@@ -133,7 +118,6 @@ namespace MultiplayerARPG.MMO
                         _mapServerPeersByKey.Remove(key);
                         _instanceMapServerPeersByKey.Remove(key);
                         _mapServerPeers.Remove(eventData.connectionId);
-                        RemoveMapUsers(eventData.connectionId);
                     }
                     RemoveAllocateMapServer(eventData.connectionId);
                     break;
@@ -159,28 +143,6 @@ namespace MultiplayerARPG.MMO
                         _allocateMapServerPeersByRefId[key].RemoveAt(j);
                     }
                 }
-            }
-        }
-#endif
-
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-        private void RemoveMapUsers(long connectionId)
-        {
-            List<KeyValuePair<string, SocialCharacterData>> mapUsers = _mapUsersByCharacterId.ToList();
-            foreach (KeyValuePair<string, SocialCharacterData> entry in mapUsers)
-            {
-                // Find characters which connected to disconnecting map server
-                if (!_connectionIdsByCharacterId.TryGetValue(entry.Key, out long tempConnectionId) || connectionId != tempConnectionId)
-                    continue;
-
-                // Clear disconnecting map users data
-                _mapUsersByCharacterId.Remove(entry.Key);
-                _connectionIdsByCharacterId.Remove(entry.Key);
-                _connectionIdsByCharacterName.Remove(entry.Value.characterName);
-                _connectionIdsByDespawningCharacterId[entry.Key] = connectionId;
-
-                // Send remove message to other map servers
-                UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, entry.Value, connectionId);
             }
         }
 #endif
@@ -378,9 +340,9 @@ namespace MultiplayerARPG.MMO
                     long senderConnectionId = 0;
                     long receiverConnectionId = 0;
                     // Send message to map server which have the character
-                    if (!string.IsNullOrEmpty(message.senderName) && _connectionIdsByCharacterName.TryGetValue(message.senderName, out senderConnectionId))
+                    if (!string.IsNullOrEmpty(message.senderName))
                         SendPacket(senderConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
-                    if (!string.IsNullOrEmpty(message.receiverName) && _connectionIdsByCharacterName.TryGetValue(message.receiverName, out receiverConnectionId) && (receiverConnectionId != senderConnectionId))
+                    if (!string.IsNullOrEmpty(message.receiverName) && (receiverConnectionId != senderConnectionId))
                         SendPacket(receiverConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
                     break;
             }
@@ -392,37 +354,7 @@ namespace MultiplayerARPG.MMO
         {
             long connectionId = messageHandler.ConnectionId;
             UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
-            SocialCharacterData character = message.character;
-            switch (message.type)
-            {
-                case UpdateUserCharacterMessage.UpdateType.Add:
-                    if (!_mapUsersByCharacterId.ContainsKey(character.id))
-                    {
-                        _mapUsersByCharacterId[character.id] = character;
-                        _connectionIdsByCharacterId[character.id] = connectionId;
-                        _connectionIdsByCharacterName[character.characterName] = connectionId;
-                        _connectionIdsByDespawningCharacterId.Remove(character.id);
-                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, character, connectionId);
-                    }
-                    break;
-                case UpdateUserCharacterMessage.UpdateType.Remove:
-                    if (_mapUsersByCharacterId.TryGetValue(message.character.id, out character))
-                    {
-                        _mapUsersByCharacterId.Remove(character.id);
-                        _connectionIdsByCharacterId.Remove(character.id);
-                        _connectionIdsByCharacterName.Remove(character.characterName);
-                        _connectionIdsByDespawningCharacterId[character.id] = connectionId;
-                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, character, connectionId);
-                    }
-                    break;
-                case UpdateUserCharacterMessage.UpdateType.Online:
-                    if (_mapUsersByCharacterId.ContainsKey(character.id))
-                    {
-                        _mapUsersByCharacterId[character.id] = character;
-                        UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, character, connectionId);
-                    }
-                    break;
-            }
+            UpdateMapUser(message.type, message.character, connectionId);
         }
 #endif
 
@@ -487,13 +419,25 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+        public void HandleUpdateUserCount(MessageHandlerData messageHandler)
+        {
+            long connectionId = messageHandler.ConnectionId;
+            UpdateUserCountMessage message = messageHandler.ReadMessage<UpdateUserCountMessage>();
+            if (!_mapServerPeers.TryGetValue(connectionId, out CentralServerPeerInfo peerInfo))
+                return;
+            peerInfo.currentUsers = message.currentUsers;
+            peerInfo.maxUsers = message.maxUsers;
+            _mapServerPeers[connectionId] = peerInfo;
+        }
+#endif
+
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData, long exceptConnectionId)
         {
             foreach (long mapServerConnectionId in _mapServerPeers.Keys)
             {
                 if (mapServerConnectionId == exceptConnectionId)
                     continue;
-
                 UpdateMapUser(mapServerConnectionId, updateType, userData);
             }
         }
@@ -521,19 +465,14 @@ namespace MultiplayerARPG.MMO
                     writer.Put(characterId);
                 });
             }
-            List<SocialCharacterData> mapUsers = new List<SocialCharacterData>(_mapUsersByCharacterId.Values);
-            foreach (SocialCharacterData mapUser in mapUsers)
-            {
-                _mapUsersByCharacterId.Remove(userId);
-            }
         }
 #endif
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public void KickUser(string userId, UITextKeys message)
         {
-            List<long> mapServerPeerConnectionIds = new List<long>(_mapServerPeers.Keys);
-            foreach (long connectionId in mapServerPeerConnectionIds)
+            List<long> connectionIds = new List<long>(_mapServerPeers.Keys);
+            foreach (long connectionId in connectionIds)
             {
                 SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.KickUser, (writer) =>
                 {
@@ -541,25 +480,8 @@ namespace MultiplayerARPG.MMO
                     writer.PutPackedUShort((ushort)message);
                 });
             }
-            List<SocialCharacterData> mapUsers = new List<SocialCharacterData>(_mapUsersByCharacterId.Values);
-            foreach (SocialCharacterData mapUser in mapUsers)
-            {
-                _mapUsersByCharacterId.Remove(userId);
-            }
         }
 #endif
-
-        public bool MapContainsUser(string userId)
-        {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            foreach (SocialCharacterData mapUser in _mapUsersByCharacterId.Values)
-            {
-                if (mapUser.userId.Equals(userId))
-                    return true;
-            }
-#endif
-            return false;
-        }
 
         public async UniTask RequestSpawnMap(long mapSpawnConnectionId, RequestSpawnMapMessage request, string key, RequestProceedResultDelegate<ResponseSpawnMapMessage> resultForMapServer)
         {
@@ -627,24 +549,21 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             result.InvokeSuccess(new ResponseUserCountMessage()
             {
-                userCount = _mapUsersByCharacterId.Count,
+                userCount = CountUsers(),
             });
-#endif
             return default;
+#endif
         }
 
         public List<ChannelEntry> GetChannels()
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             Dictionary<string, int> connectionCounts = new Dictionary<string, int>();
-            foreach (long connectionId in ConnectionIdsByCharacterId.Values)
+            foreach (var peerInfo in MapServerPeers.Values)
             {
-                if (!_mapServerPeers.ContainsKey(connectionId))
-                    continue;
-                string channelId = _mapServerPeers[connectionId].channelId;
-                if (!connectionCounts.ContainsKey(channelId))
-                    connectionCounts.Add(channelId, 0);
-                connectionCounts[channelId]++;
+                if (!connectionCounts.ContainsKey(peerInfo.channelId))
+                    connectionCounts[peerInfo.channelId] = 0;
+                connectionCounts[peerInfo.channelId] += peerInfo.currentUsers;
             }
             List<ChannelEntry> result = new List<ChannelEntry>();
             foreach (ChannelData data in _centralNetworkManager.Channels.Values)
@@ -663,64 +582,108 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public int GetChannelConnections(string channelId)
+        public async UniTask<bool> MapContainsUser(string userId)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            int connections = 0;
-            foreach (long connectionId in ConnectionIdsByCharacterId.Values)
+            List<long> connectionIds = new List<long>(_mapServerPeers.Keys);
+            foreach (long connectionId in connectionIds)
             {
-                if (!_mapServerPeers.ContainsKey(connectionId))
-                    continue;
-                if (!string.Equals(channelId, _mapServerPeers[connectionId].channelId))
-                    continue;
-                connections++;
-            }
-            return connections;
-#else
-            return 0;
-#endif
-        }
-
-        public async UniTask<bool> ConfirmDespawnCharacter(string characterId)
-        {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            if (!_connectionIdsByDespawningCharacterId.TryGetValue(characterId, out long connectionId))
-            {
-                // No despawning character, so it may not played by player or already despawned
-                return true;
-            }
-            if (!_mapServerPeers.ContainsKey(connectionId))
-            {
-                // No map-server peer, it may be disconnected, so determine that it is despawned
-                return true;
-            }
-            AsyncResponseData<EmptyMessage> result = await SendRequestAsync<RequestForceDespawnCharacterMessage, EmptyMessage>(connectionId, MMORequestTypes.ForceDespawnCharacter, new RequestForceDespawnCharacterMessage()
-            {
-                characterId = characterId,
-            });
-            switch (result.ResponseCode)
-            {
-                case AckResponseCode.Success:
-                    // Confirmed by map-server that the character was despawned, so it can be removed from despawning collection
-                    _connectionIdsByDespawningCharacterId.Remove(characterId);
-                    return true;
-                case AckResponseCode.Timeout:
-                    // TODO: May tell client what is happening
-                    break;
-                case AckResponseCode.Error:
-                    // TODO: May tell client what is happening
-                    break;
-                case AckResponseCode.Unimplemented:
-                    // TODO: May tell client what is happening
-                    break;
-                case AckResponseCode.Exception:
-                    // TODO: May tell client what is happening
-                    break;
+                AsyncResponseData<ResponseFindOnlineUserMessage> result = await SendRequestAsync<RequestFindOnlineUserMessage, ResponseFindOnlineUserMessage>(connectionId, MMORequestTypes.FindOnlineUser, new RequestFindOnlineUserMessage()
+                {
+                    userId = userId,
+                });
+                switch (result.ResponseCode)
+                {
+                    case AckResponseCode.Success:
+                        // Confirmed by map-server that the character was despawned
+                        if (result.Response.isFound)
+                            return true;
+                        break;
+                    case AckResponseCode.Timeout:
+                        // TODO: May tell client what is happening
+                        // Error occurs but we don't want user to login, so return `TRUE`
+                        return true;
+                    case AckResponseCode.Error:
+                        // TODO: May tell client what is happening
+                        // Error occurs but we don't want user to login, so return `TRUE`
+                        return true;
+                    case AckResponseCode.Unimplemented:
+                        // TODO: May tell client what is happening
+                        // Error occurs but we don't want user to login, so return `TRUE`
+                        return true;
+                    case AckResponseCode.Exception:
+                        // TODO: May tell client what is happening
+                        // Error occurs but we don't want user to login, so return `TRUE`
+                        return true;
+                }
             }
 #else
             await UniTask.Yield();
 #endif
             return false;
+        }
+
+        public async UniTask<bool> ConfirmDespawnCharacter(string characterId)
+        {
+            bool allDone = true;
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            List<long> connectionIds = new List<long>(_mapServerPeers.Keys);
+            foreach (long connectionId in connectionIds)
+            {
+                AsyncResponseData<EmptyMessage> result = await SendRequestAsync<RequestForceDespawnCharacterMessage, EmptyMessage>(connectionId, MMORequestTypes.ForceDespawnCharacter, new RequestForceDespawnCharacterMessage()
+                {
+                    characterId = characterId,
+                });
+                switch (result.ResponseCode)
+                {
+                    case AckResponseCode.Success:
+                        // Confirmed by map-server that the character was despawned
+                        break;
+                    case AckResponseCode.Timeout:
+                        // TODO: May tell client what is happening
+                        allDone = false;
+                        break;
+                    case AckResponseCode.Error:
+                        // TODO: May tell client what is happening
+                        allDone = false;
+                        break;
+                    case AckResponseCode.Unimplemented:
+                        // TODO: May tell client what is happening
+                        allDone = false;
+                        break;
+                    case AckResponseCode.Exception:
+                        // TODO: May tell client what is happening
+                        allDone = false;
+                        break;
+                }
+            }
+#else
+            await UniTask.Yield();
+#endif
+            return allDone;
+        }
+
+        public int CountUsers()
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            int count = 0;
+            foreach (var peerInfo in MapServerPeers.Values)
+            {
+                count += peerInfo.currentUsers;
+            }
+            return count;
+#else
+            return 0;
+#endif
+        }
+
+        public int CountUsers(string channelId)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            if (MapServerPeersByKey.TryGetValue(channelId, out CentralServerPeerInfo peerInfo))
+                return peerInfo.currentUsers;
+#endif
+            return 0;
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)

@@ -17,5 +17,6 @@
         public const ushort Channels = 12;
         public const ushort ForceDespawnCharacter = 13;
         public const ushort RunMap = 14;
+        public const ushort FindOnlineUser = 15;
     }
 }

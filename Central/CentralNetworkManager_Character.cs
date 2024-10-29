@@ -287,7 +287,7 @@ namespace MultiplayerARPG.MMO
             int maxConnections = channel.maxConnections;
             if (maxConnections <= 0)
                 maxConnections = defaultChannelMaxConnections;
-            if (ClusterServer.GetChannelConnections(channelId) >= maxConnections)
+            if (ClusterServer.CountUsers(channelId) >= maxConnections)
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {

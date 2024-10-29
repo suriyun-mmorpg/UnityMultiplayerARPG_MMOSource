@@ -10,6 +10,8 @@ namespace MultiplayerARPG.MMO
         public int networkPort;
         public string channelId;
         public string refId;
+        public int currentUsers;
+        public int maxUsers;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -18,6 +20,8 @@ namespace MultiplayerARPG.MMO
             networkPort = reader.GetInt();
             channelId = reader.GetString();
             refId = reader.GetString();
+            currentUsers = reader.GetPackedInt();
+            maxUsers = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -27,6 +31,8 @@ namespace MultiplayerARPG.MMO
             writer.Put(networkPort);
             writer.Put(channelId);
             writer.Put(refId);
+            writer.PutPackedInt(currentUsers);
+            writer.PutPackedInt(maxUsers);
         }
     }
 }
