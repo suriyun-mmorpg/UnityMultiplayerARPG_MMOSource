@@ -6,6 +6,7 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
+            State = (TransactionUpdateBuildingState)reader.GetByte();
             ChannelId = reader.GetString();
             MapName = reader.GetString();
             BuildingData = reader.Get(() => new BuildingSaveData());
@@ -18,6 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put((byte)State);
             writer.Put(ChannelId);
             writer.Put(MapName);
             writer.Put(BuildingData);
