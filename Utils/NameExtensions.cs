@@ -18,6 +18,7 @@ namespace MultiplayerARPG.MMO
         {
             if (overrideUsernameValidating != null)
                 return overrideUsernameValidating.Invoke(name);
+            // Allow all a-z, A-Z, 0-9, _
             return Regex.Match(name, "^[a-zA-Z0-9_]*$").Success;
         }
 
@@ -25,14 +26,16 @@ namespace MultiplayerARPG.MMO
         {
             if (overrideCharacterNameValidating != null)
                 return overrideCharacterNameValidating.Invoke(name);
-            return Regex.Match(name, "^[a-zA-Z0-9_]*$").Success;
+            // Allow all Unicode letters, numbers, underscores, and diacritics, but not spaces
+            return Regex.Match(name, @"^[\p{L}\p{M}\p{N}_]*$").Success;
         }
 
         public static bool IsValidGuildName(string name)
         {
             if (overrideGuildNameValidating != null)
                 return overrideGuildNameValidating.Invoke(name);
-            return Regex.Match(name, "^[a-zA-Z0-9_]*$").Success;
+            // Allow all Unicode letters, numbers, underscores, and diacritics, but not spaces
+            return Regex.Match(name, @"^[\p{L}\p{M}\p{N}_]*$").Success;
         }
     }
 }
