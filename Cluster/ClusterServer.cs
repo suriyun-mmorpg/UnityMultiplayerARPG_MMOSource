@@ -323,29 +323,11 @@ namespace MultiplayerARPG.MMO
         {
             long connectionId = messageHandler.ConnectionId;
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
-            switch (message.channel)
+            // Send message to all map servers, let's map servers filter messages
+            SendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
             {
-                case ChatChannel.Local:
-                case ChatChannel.Global:
-                case ChatChannel.System:
-                case ChatChannel.Party:
-                case ChatChannel.Guild:
-                    // Send message to all map servers, let's map servers filter messages
-                    SendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
-                    {
-                        writer.PutValue(message);
-                    });
-                    break;
-                case ChatChannel.Whisper:
-                    long senderConnectionId = 0;
-                    long receiverConnectionId = 0;
-                    // Send message to map server which have the character
-                    if (!string.IsNullOrEmpty(message.senderName))
-                        SendPacket(senderConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
-                    if (!string.IsNullOrEmpty(message.receiverName) && (receiverConnectionId != senderConnectionId))
-                        SendPacket(receiverConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
-                    break;
-            }
+                writer.PutValue(message);
+            });
         }
 #endif
 
