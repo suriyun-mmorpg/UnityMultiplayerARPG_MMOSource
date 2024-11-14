@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
-            State = (TransactionUpdateCharacterState)reader.GetByte();
+            State = (TransactionUpdateCharacterState)reader.GetPackedInt();
             CharacterData = reader.Get(() => new PlayerCharacterData());
             SummonBuffs = reader.GetList<CharacterBuff>();
             bool isNull = reader.GetBool();
@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)State);
+            writer.PutPackedInt((int)State);
             writer.Put(CharacterData);
             writer.PutList(SummonBuffs);
             bool isNull = StorageItems == null;
