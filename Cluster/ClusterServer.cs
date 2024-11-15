@@ -533,8 +533,8 @@ namespace MultiplayerARPG.MMO
             {
                 userCount = CountUsers(),
             });
-            return default;
 #endif
+            return default;
         }
 
         public List<ChannelEntry> GetChannels()
