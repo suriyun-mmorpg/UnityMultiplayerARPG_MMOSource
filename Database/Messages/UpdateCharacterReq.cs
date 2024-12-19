@@ -6,17 +6,14 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
-            State = (TransactionUpdateCharacterState)reader.GetPackedInt();
+            State = (TransactionUpdateCharacterState)reader.GetPackedUInt();
             CharacterData = reader.Get(() => new PlayerCharacterData());
             SummonBuffs = reader.GetList<CharacterBuff>();
-            bool isNull;
-            isNull = reader.GetBool();
-            if (!isNull)
+            if (State.Has(TransactionUpdateCharacterState.PlayerStorageItems))
                 PlayerStorageItems = reader.GetList<CharacterItem>();
             else
                 PlayerStorageItems = null;
-            isNull = reader.GetBool();
-            if (!isNull)
+            if (State.Has(TransactionUpdateCharacterState.ProtectedStorageItems))
                 ProtectedStorageItems = reader.GetList<CharacterItem>();
             else
                 ProtectedStorageItems = null;
@@ -25,17 +22,12 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedInt((int)State);
+            writer.PutPackedUInt((uint)State);
             writer.Put(CharacterData);
             writer.PutList(SummonBuffs);
-            bool isNull;
-            isNull = PlayerStorageItems == null;
-            writer.Put(isNull);
-            if (!isNull)
+            if (State.Has(TransactionUpdateCharacterState.PlayerStorageItems))
                 writer.PutList(PlayerStorageItems);
-            isNull = ProtectedStorageItems == null;
-            writer.Put(isNull);
-            if (!isNull)
+            if (State.Has(TransactionUpdateCharacterState.ProtectedStorageItems))
                 writer.PutList(ProtectedStorageItems);
             writer.Put(DeleteStorageReservation);
         }

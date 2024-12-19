@@ -6,12 +6,11 @@ namespace MultiplayerARPG.MMO
     {
         public void Deserialize(NetDataReader reader)
         {
-            State = (TransactionUpdateBuildingState)reader.GetByte();
+            State = (TransactionUpdateBuildingState)reader.GetPackedUInt();
             ChannelId = reader.GetString();
             MapName = reader.GetString();
             BuildingData = reader.Get(() => new BuildingSaveData());
-            bool isNull = reader.GetBool();
-            if (!isNull)
+            if (State.Has(TransactionUpdateBuildingState.StorageItems))
                 StorageItems = reader.GetList<CharacterItem>();
             else
                 StorageItems = null;
@@ -19,13 +18,11 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)State);
+            writer.PutPackedUInt((uint)State);
             writer.Put(ChannelId);
             writer.Put(MapName);
             writer.Put(BuildingData);
-            bool isNull = StorageItems == null;
-            writer.Put(isNull);
-            if (!isNull)
+            if (State.Has(TransactionUpdateBuildingState.StorageItems))
                 writer.PutList(StorageItems);
         }
     }
