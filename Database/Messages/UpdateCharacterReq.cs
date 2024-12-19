@@ -9,11 +9,17 @@ namespace MultiplayerARPG.MMO
             State = (TransactionUpdateCharacterState)reader.GetPackedInt();
             CharacterData = reader.Get(() => new PlayerCharacterData());
             SummonBuffs = reader.GetList<CharacterBuff>();
-            bool isNull = reader.GetBool();
+            bool isNull;
+            isNull = reader.GetBool();
             if (!isNull)
                 StorageItems = reader.GetList<CharacterItem>();
             else
                 StorageItems = null;
+            isNull = reader.GetBool();
+            if (!isNull)
+                ProtectedStorageItems = reader.GetList<CharacterItem>();
+            else
+                ProtectedStorageItems = null;
             DeleteStorageReservation = reader.GetBool();
         }
 
@@ -22,10 +28,15 @@ namespace MultiplayerARPG.MMO
             writer.PutPackedInt((int)State);
             writer.Put(CharacterData);
             writer.PutList(SummonBuffs);
-            bool isNull = StorageItems == null;
+            bool isNull;
+            isNull = StorageItems == null;
             writer.Put(isNull);
             if (!isNull)
                 writer.PutList(StorageItems);
+            isNull = ProtectedStorageItems == null;
+            writer.Put(isNull);
+            if (!isNull)
+                writer.PutList(ProtectedStorageItems);
             writer.Put(DeleteStorageReservation);
         }
     }
