@@ -174,10 +174,12 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             List<UniTask> tasks = new List<UniTask>
             {
-                Database.UpdateCharacter(request.State, request.CharacterData, request.SummonBuffs, request.StorageItems, request.DeleteStorageReservation),
+                Database.UpdateCharacter(request.State, request.CharacterData, request.SummonBuffs, request.PlayerStorageItems, request.ProtectedStorageItems, request.DeleteStorageReservation),
             };
-            if (request.StorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.StorageItems));
+            if (request.PlayerStorageItems != null)
+                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.PlayerStorageItems));
+            if (request.ProtectedStorageItems != null)
+                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Protected, request.CharacterData.UserId, request.ProtectedStorageItems));
             await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new CharacterResp()
             {
