@@ -12,9 +12,9 @@ namespace MultiplayerARPG.MMO
             bool isNull;
             isNull = reader.GetBool();
             if (!isNull)
-                StorageItems = reader.GetList<CharacterItem>();
+                PlayerStorageItems = reader.GetList<CharacterItem>();
             else
-                StorageItems = null;
+                PlayerStorageItems = null;
             isNull = reader.GetBool();
             if (!isNull)
                 ProtectedStorageItems = reader.GetList<CharacterItem>();
@@ -29,10 +29,10 @@ namespace MultiplayerARPG.MMO
             writer.Put(CharacterData);
             writer.PutList(SummonBuffs);
             bool isNull;
-            isNull = StorageItems == null;
+            isNull = PlayerStorageItems == null;
             writer.Put(isNull);
             if (!isNull)
-                writer.PutList(StorageItems);
+                writer.PutList(PlayerStorageItems);
             isNull = ProtectedStorageItems == null;
             writer.Put(isNull);
             if (!isNull)
