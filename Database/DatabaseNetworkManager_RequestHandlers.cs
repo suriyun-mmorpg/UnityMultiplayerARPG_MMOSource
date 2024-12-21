@@ -172,15 +172,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid UpdateCharacter(RequestHandlerData requestHandler, UpdateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            List<UniTask> tasks = new List<UniTask>
-            {
-                Database.UpdateCharacter(request.State, request.CharacterData, request.SummonBuffs, request.PlayerStorageItems, request.ProtectedStorageItems, request.DeleteStorageReservation),
-            };
-            if (request.PlayerStorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.PlayerStorageItems));
-            if (request.ProtectedStorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Protected, request.CharacterData.Id, request.ProtectedStorageItems));
-            await UniTask.WhenAll(tasks);
+            await Database.UpdateCharacter(request.State, request.CharacterData, request.SummonBuffs, request.DeleteStorageReservation);
             result.InvokeSuccess(new CharacterResp()
             {
                 CharacterData = request.CharacterData,
@@ -262,13 +254,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid UpdateBuilding(RequestHandlerData requestHandler, UpdateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            List<UniTask> tasks = new List<UniTask>
-            {
-                Database.UpdateBuilding(request.ChannelId, request.MapName, request.BuildingData, request.StorageItems),
-            };
-            if (request.StorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Building, request.BuildingData.Id, request.StorageItems));
-            await UniTask.WhenAll(tasks);
+            await Database.UpdateBuilding(request.ChannelId, request.MapName, request.BuildingData);
             result.InvokeSuccess(new BuildingResp()
             {
                 BuildingData = request.BuildingData
