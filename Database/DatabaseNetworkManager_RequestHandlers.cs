@@ -179,7 +179,7 @@ namespace MultiplayerARPG.MMO
             if (request.PlayerStorageItems != null)
                 tasks.Add(DatabaseCache.SetStorageItems(StorageType.Player, request.CharacterData.UserId, request.PlayerStorageItems));
             if (request.ProtectedStorageItems != null)
-                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Protected, request.CharacterData.UserId, request.ProtectedStorageItems));
+                tasks.Add(DatabaseCache.SetStorageItems(StorageType.Protected, request.CharacterData.Id, request.ProtectedStorageItems));
             await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new CharacterResp()
             {
