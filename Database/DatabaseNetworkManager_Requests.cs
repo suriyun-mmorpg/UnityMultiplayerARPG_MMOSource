@@ -7,10 +7,14 @@ namespace MultiplayerARPG.MMO
     public partial class DatabaseNetworkManager : IDatabaseClient
     {
         private async UniTask<DatabaseApiResult<TResp>> SendRequest<TReq, TResp>(TReq request, ushort requestType, string functionName)
-            where TReq : INetSerializable, new()
-            where TResp : INetSerializable, new()
+            where TReq : struct, INetSerializable
+            where TResp : struct, INetSerializable
         {
-            var resp = await Client.SendRequestAsync<TReq, TResp>(requestType, request);
+            var resp = await Client.SendRequestAsync<DbRequestMessage<TReq>, TResp>(requestType, new DbRequestMessage<TReq>()
+            {
+                RequestTimeUtc = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Data = request,
+            });
             if (!resp.IsSuccess)
             {
                 Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {functionName} status: {resp.ResponseCode}");
@@ -27,9 +31,13 @@ namespace MultiplayerARPG.MMO
         }
 
         private async UniTask<DatabaseApiResult> SendRequest<TReq>(TReq request, ushort requestType, string functionName)
-            where TReq : INetSerializable, new()
+            where TReq : struct, INetSerializable
         {
-            var resp = await Client.SendRequestAsync<TReq, EmptyMessage>(requestType, request);
+            var resp = await Client.SendRequestAsync<DbRequestMessage<TReq>, EmptyMessage>(requestType, new DbRequestMessage<TReq>()
+            {
+                RequestTimeUtc = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Data = request,
+            });
             if (!resp.IsSuccess)
             {
                 Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {functionName} status: {resp.ResponseCode}");
