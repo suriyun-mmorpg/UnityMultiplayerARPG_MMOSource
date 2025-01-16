@@ -79,5 +79,6 @@
         public const ushort GetGuildRequests = 83;
         public const ushort GetGuildRequestNotification = 84;
         public const ushort UpdateGuildMemberCount = 85;
+        public const ushort UpdateStorageAndCharacterItems = 86;
     }
 }
