@@ -878,6 +878,29 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid UpdateStorageAndCharacterItems(RequestHandlerData requestHandler, DbRequestMessage<UpdateStorageAndCharacterItemsReq> request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            if (request.Data.DeleteStorageReservation)
+            {
+                // Delete reserver
+                await Database.DeleteReservedStorage(request.Data.StorageType, request.Data.StorageOwnerId);
+            }
+            // Update to cache
+            await DatabaseCache.SetStorageItems(request.Data.StorageType, request.Data.StorageOwnerId, request.Data.StorageItems);
+            // Update to database
+            await Database.UpdateStorageAndCharacterItems(
+                request.Data.StorageType,
+                request.Data.StorageOwnerId,
+                request.Data.StorageItems,
+                request.Data.CharacterId,
+                request.Data.SelectableWeaponSets,
+                request.Data.EquipItems,
+                request.Data.NonEquipItems);
+            result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
         protected async UniTaskVoid DeleteAllReservedStorage(RequestHandlerData requestHandler, DbRequestMessage<EmptyMessage> request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)

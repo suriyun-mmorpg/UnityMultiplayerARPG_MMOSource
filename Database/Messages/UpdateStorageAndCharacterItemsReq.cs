@@ -10,7 +10,9 @@ namespace MultiplayerARPG.MMO
             StorageOwnerId = reader.GetString();
             StorageItems = reader.GetList<CharacterItem>();
             CharacterId = reader.GetString();
-            CharacterItems = reader.GetList<CharacterItem>();
+            SelectableWeaponSets = reader.GetList<EquipWeapons>();
+            EquipItems = reader.GetList<CharacterItem>();
+            NonEquipItems = reader.GetList<CharacterItem>();
             DeleteStorageReservation = reader.GetBool();
         }
 
@@ -20,7 +22,9 @@ namespace MultiplayerARPG.MMO
             writer.Put(StorageOwnerId);
             writer.PutList(StorageItems);
             writer.Put(CharacterId);
-            writer.PutList(CharacterItems);
+            writer.PutList(SelectableWeaponSets);
+            writer.PutList(EquipItems);
+            writer.PutList(NonEquipItems);
             writer.Put(DeleteStorageReservation);
         }
     }
