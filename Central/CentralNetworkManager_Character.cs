@@ -264,7 +264,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Kick player's character from map-servers
-            if (!await ClusterServer.ConfirmDespawnCharacter(request.characterId))
+            if (!await ClusterServer.ConfirmDespawnCharacter(userPeerInfo.userId))
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {

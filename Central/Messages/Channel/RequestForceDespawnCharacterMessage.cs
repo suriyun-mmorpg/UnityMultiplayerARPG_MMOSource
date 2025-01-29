@@ -4,16 +4,16 @@ namespace MultiplayerARPG.MMO
 {
     public struct RequestForceDespawnCharacterMessage : INetSerializable
     {
-        public string characterId;
+        public string userId;
 
         public void Deserialize(NetDataReader reader)
         {
-            characterId = reader.GetString();
+            userId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(characterId);
+            writer.Put(userId);
         }
     }
 }

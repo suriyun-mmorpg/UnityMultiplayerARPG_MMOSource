@@ -605,7 +605,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async UniTask<bool> ConfirmDespawnCharacter(string characterId)
+        public async UniTask<bool> ConfirmDespawnCharacter(string userId)
         {
             bool allDone = true;
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
@@ -614,7 +614,7 @@ namespace MultiplayerARPG.MMO
             {
                 AsyncResponseData<EmptyMessage> result = await SendRequestAsync<RequestForceDespawnCharacterMessage, EmptyMessage>(connectionId, MMORequestTypes.ForceDespawnCharacter, new RequestForceDespawnCharacterMessage()
                 {
-                    characterId = characterId,
+                    userId = userId,
                 });
                 switch (result.ResponseCode)
                 {
