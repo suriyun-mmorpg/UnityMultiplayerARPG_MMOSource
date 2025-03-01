@@ -428,5 +428,15 @@ namespace MultiplayerARPG.MMO
         {
             return await SendRequest(request, DatabaseRequestTypes.UpdateGuildMemberCount, nameof(UpdateGuildMemberCountAsync));
         }
+
+        public async UniTask<DatabaseApiResult> RemoveGuildCacheAsync(GetGuildReq request)
+        {
+            return await SendRequest(request, DatabaseRequestTypes.RemoveGuildCache, nameof(RemoveGuildCacheAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> RemovePartyCacheAsync(GetPartyReq request)
+        {
+            return await SendRequest(request, DatabaseRequestTypes.RemovePartyCache, nameof(RemovePartyCacheAsync));
+        }
     }
 }

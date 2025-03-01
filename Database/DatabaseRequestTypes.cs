@@ -80,5 +80,7 @@
         public const ushort GetGuildRequestNotification = 84;
         public const ushort UpdateGuildMemberCount = 85;
         public const ushort UpdateStorageAndCharacterItems = 86;
+        public const ushort RemoveGuildCache = 87;
+        public const ushort RemovePartyCache = 88;
     }
 }
