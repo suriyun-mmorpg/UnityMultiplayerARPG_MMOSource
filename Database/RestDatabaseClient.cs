@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 #if NET || NETCOREAPP
-using DotNetRestClient;
+using Insthync.DotNetRestClient;
 #else
-using UnityRestClient;
+using Insthync.UnityRestClient;
 #endif
 
 namespace MultiplayerARPG.MMO
