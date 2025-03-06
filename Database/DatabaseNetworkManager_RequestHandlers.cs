@@ -172,7 +172,21 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid UpdateCharacter(RequestHandlerData requestHandler, DbRequestMessage<UpdateCharacterReq> request, RequestProceedResultDelegate<CharacterResp> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+            PlayerCharacterData playerCharacter = await GetCharacter(request.Data.CharacterData.Id);
+            if (playerCharacter == null)
+            {
+                result.InvokeError(new CharacterResp()
+                {
+                    CharacterData = null,
+                });
+            }
             await Database.UpdateCharacter(request.Data.State, request.Data.CharacterData, request.Data.SummonBuffs, request.Data.DeleteStorageReservation);
+            List<UniTask> tasks = new List<UniTask>
+            {
+                DatabaseCache.SetPlayerCharacter(request.Data.CharacterData),
+                DatabaseCache.SetSummonBuffs(request.Data.CharacterData.Id, request.Data.SummonBuffs),
+            };
+            await UniTask.WhenAll(tasks);
             result.InvokeSuccess(new CharacterResp()
             {
                 CharacterData = request.Data.CharacterData,
@@ -183,14 +197,20 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid DeleteCharacter(RequestHandlerData requestHandler, DbRequestMessage<DeleteCharacterReq> request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
-            // Remove data from cache
             PlayerCharacterData playerCharacter = await GetCharacter(request.Data.CharacterId);
-            if (playerCharacter != null)
+            if (playerCharacter == null)
             {
-                await DatabaseCache.RemoveSocialCharacter(playerCharacter.Id);
+                result.InvokeError(EmptyMessage.Value);
             }
             // Delete data from database
             await Database.DeleteCharacter(request.Data.UserId, request.Data.CharacterId);
+            // Remove data from cache
+            if (playerCharacter != null)
+            {
+                await UniTask.WhenAll(
+                    DatabaseCache.RemovePlayerCharacter(playerCharacter.Id),
+                    DatabaseCache.RemoveSocialCharacter(playerCharacter.Id));
+            }
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
         }
