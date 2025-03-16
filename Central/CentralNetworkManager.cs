@@ -125,13 +125,21 @@ namespace MultiplayerARPG.MMO
             if (defaultChannelMaxConnections <= 0)
                 defaultChannelMaxConnections = 500;
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            minCharacterNameLength = GameInstance.Singleton.minCharacterNameLength;
-            maxCharacterNameLength = GameInstance.Singleton.maxCharacterNameLength;
+            GameInstance.OnGameDataLoadedEvent += GameInstance_OnGameDataLoadedEvent;
 #endif
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
             ClusterServer = new ClusterServer(this);
 #endif
         }
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        private void GameInstance_OnGameDataLoadedEvent()
+        {
+            GameInstance.OnGameDataLoadedEvent -= GameInstance_OnGameDataLoadedEvent;
+            minCharacterNameLength = GameInstance.Singleton.minCharacterNameLength;
+            maxCharacterNameLength = GameInstance.Singleton.maxCharacterNameLength;
+        }
+#endif
 
         protected override void Update()
         {
