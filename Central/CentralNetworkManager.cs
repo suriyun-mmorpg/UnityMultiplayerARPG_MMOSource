@@ -210,7 +210,7 @@ namespace MultiplayerARPG.MMO
                 return;
             s_Writer.Reset();
             s_Writer.PutPackedUShort((ushort)message);
-            KickClient(connectionId, s_Writer.Data);
+            KickClient(connectionId, s_Writer.CopyData());
         }
 
         protected void HandleServerDisconnect(MessageHandlerData messageHandler)
