@@ -141,6 +141,15 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
+        public static bool ReadArgs(string[] args, string argName, out bool result, bool defaultValue)
+        {
+            result = defaultValue;
+            string text;
+            if (ReadArgs(args, argName, out text, defaultValue.ToString()) && bool.TryParse(text, out result))
+                return true;
+            return false;
+        }
+
         public static bool ReadArgs(string[] args, string argName, out List<string> result, List<string> defaultValue)
         {
             result = new List<string>();
@@ -162,6 +171,59 @@ namespace MultiplayerARPG.MMO
 
             List<string> argsList = new List<string>(args);
             return argsList.Contains(argName);
+        }
+
+        public static bool ReadEnv(string envName, out string result, string defaultValue)
+        {
+            result = defaultValue;
+            string text = System.Environment.GetEnvironmentVariable(envName);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                result = text;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool ReadEnv(string envName, out int result, int defaultValue)
+        {
+            result = defaultValue;
+            string text = System.Environment.GetEnvironmentVariable(envName);
+            if (!string.IsNullOrWhiteSpace(text) && int.TryParse(text, out result))
+                return true;
+            return false;
+        }
+
+        public static bool ReadEnv(string envName, out float result, float defaultValue)
+        {
+            result = defaultValue;
+            string text = System.Environment.GetEnvironmentVariable(envName);
+            if (!string.IsNullOrWhiteSpace(text) && float.TryParse(text, out result))
+                return true;
+            return false;
+        }
+
+        public static bool ReadEnv(string envName, out bool result, bool defaultValue)
+        {
+            result = defaultValue;
+            string text = System.Environment.GetEnvironmentVariable(envName);
+            if (!string.IsNullOrWhiteSpace(text) && bool.TryParse(text, out result))
+                return true;
+            return false;
+        }
+
+        public static bool ReadEnv(string envName, out List<string> result, List<string> defaultValue)
+        {
+            result = new List<string>();
+            string text = System.Environment.GetEnvironmentVariable(envName);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                result.AddRange(text.Split('|'));
+                return true;
+            }
+            if (defaultValue != null)
+                result.AddRange(defaultValue);
+            return false;
         }
     }
 }
