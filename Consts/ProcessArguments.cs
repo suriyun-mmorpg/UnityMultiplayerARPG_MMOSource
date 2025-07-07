@@ -106,5 +106,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_START_DATABASE_SERVER = "-" + CONFIG_START_DATABASE_SERVER;
         public const string CONFIG_START_MAP_SERVER = "startMapServer";
         public const string ARG_START_MAP_SERVER = "-" + CONFIG_START_MAP_SERVER;
+        // Client
+        public const string CONFIG_CLIENT_CONFIG_URL = "clientConfigUrl";
+        public const string ARG_CLIENT_CONFIG_URL = "-" + CONFIG_CLIENT_CONFIG_URL;
     }
 }
