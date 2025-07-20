@@ -324,7 +324,7 @@ namespace MultiplayerARPG.MMO
             long connectionId = messageHandler.ConnectionId;
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             // Send message to all map servers, let's map servers filter messages
-            SendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+            SendPacketToAllConnections(0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.Chat, (writer) =>
             {
                 writer.PutValue(message);
             });
@@ -456,7 +456,7 @@ namespace MultiplayerARPG.MMO
             List<long> connectionIds = new List<long>(_mapServerPeers.Keys);
             foreach (long connectionId in connectionIds)
             {
-                SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.KickUser, (writer) =>
+                SendPacket(connectionId, 0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.KickUser, (writer) =>
                 {
                     writer.Put(userId);
                     writer.PutPackedUShort((ushort)message);
