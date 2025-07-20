@@ -195,7 +195,7 @@ namespace MultiplayerARPG.MMO
         {
             if (!IsServer)
                 return;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.Disconnect, (writer) => writer.PutBytesWithLength(data));
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Disconnect, (writer) => writer.PutBytesWithLength(data));
 #if NET || NETCOREAPP
             await Task.Delay(500);
 #else
