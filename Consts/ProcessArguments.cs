@@ -92,6 +92,8 @@ namespace MultiplayerARPG.MMO
 
         public const string CONFIG_DISABLE_DATABASE_CACHING = "disableDatabaseCaching";
         public const string ARG_DISABLE_DATABASE_CACHING = "-" + CONFIG_DISABLE_DATABASE_CACHING;
+        public const string CONFIG_DATABASE_CACHE_OPTION_INDEX = "databaseCacheOptionIndex";
+        public const string ARG_DATABASE_CACHE_OPTION_INDEX = "-" + CONFIG_DATABASE_CACHE_OPTION_INDEX;
 
         public const string CONFIG_DATABASE_ADDRESS = "databaseManagerAddress";
         public const string ARG_DATABASE_ADDRESS = "-" + CONFIG_DATABASE_ADDRESS;
