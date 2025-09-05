@@ -827,7 +827,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            guild.AddSkillLevel(request.Data.SkillId);
+            if (!guild.AddSkillLevel(request.Data.SkillId))
+            {
+                result.InvokeError(new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to database
             await Database.UpdateGuildSkillLevel(request.Data.GuildId, request.Data.SkillId, guild.GetSkillLevel(request.Data.SkillId), guild.skillPoint);
             // Update to cache
