@@ -82,5 +82,10 @@
         public const ushort UpdateStorageAndCharacterItems = 86;
         public const ushort RemoveGuildCache = 87;
         public const ushort RemovePartyCache = 88;
+        public const ushort GetUserUnlockContents = 89;
+        public const ushort GetAllUserUnlockContents = 90;
+        public const ushort ChangeUserUnlockContentProgression = 91;
+        public const ushort UpdateUserUnlockContent = 92;
+        public const ushort GetUserUnlockContent = 93;
     }
 }

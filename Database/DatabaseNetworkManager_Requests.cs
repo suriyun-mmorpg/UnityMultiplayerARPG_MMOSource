@@ -389,6 +389,31 @@ namespace MultiplayerARPG.MMO
             return await SendRequest<GetFriendRequestNotificationReq, GetFriendRequestNotificationResp>(request, DatabaseRequestTypes.GetFriendRequestNotification, nameof(GetFriendRequestNotificationAsync));
         }
 
+        public async UniTask<DatabaseApiResult<UserUnlockContentsResp>> GetUserUnlockContentsAsync(GetUserUnlockContentsReq request)
+        {
+            return await SendRequest<GetUserUnlockContentsReq, UserUnlockContentsResp>(request, DatabaseRequestTypes.GetUserUnlockContents, nameof(GetUserUnlockContentsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<UserUnlockContentsResp>> GetAllUserUnlockContentsAsync(GetAllUserUnlockContentsReq request)
+        {
+            return await SendRequest<GetAllUserUnlockContentsReq, UserUnlockContentsResp>(request, DatabaseRequestTypes.GetAllUserUnlockContents, nameof(GetAllUserUnlockContentsAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<UserUnlockContentResp>> ChangeUserUnlockContentProgressionAsync(ChangeUserUnlockContentProgressionReq request)
+        {
+            return await SendRequest<ChangeUserUnlockContentProgressionReq, UserUnlockContentResp>(request, DatabaseRequestTypes.ChangeUserUnlockContentProgression, nameof(ChangeUserUnlockContentProgressionAsync));
+        }
+
+        public async UniTask<DatabaseApiResult> UpdateUserUnlockContentAsync(UpdateUserUnlockContentReq request)
+        {
+            return await SendRequest(request, DatabaseRequestTypes.UpdateUserUnlockContent, nameof(UpdateUserUnlockContentAsync));
+        }
+
+        public async UniTask<DatabaseApiResult<UserUnlockContentResp>> GetUserUnlockContentAsync(GetUserUnlockContentReq request)
+        {
+            return await SendRequest<GetUserUnlockContentReq, UserUnlockContentResp>(request, DatabaseRequestTypes.GetUserUnlockContent, nameof(GetUserUnlockContentAsync));
+        }
+
         public async UniTask<DatabaseApiResult> UpdateUserCount(UpdateUserCountReq request)
         {
             return await SendRequest(request, DatabaseRequestTypes.UpdateUserCount, nameof(UpdateUserCount));
