@@ -17,35 +17,35 @@ namespace MultiplayerARPG.MMO
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         // Map spawn server peers
         private Dictionary<long, CentralServerPeerInfo> _mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        public IReadOnlyDictionary<long, CentralServerPeerInfo> MapSpawnServerPeers => _mapSpawnServerPeers;
+        public Dictionary<long, CentralServerPeerInfo> MapSpawnServerPeers => _mapSpawnServerPeers;
 
         // Map server peers
         private Dictionary<long, CentralServerPeerInfo> _mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        public IReadOnlyDictionary<long, CentralServerPeerInfo> MapServerPeers => _mapServerPeers;
+        public Dictionary<long, CentralServerPeerInfo> MapServerPeers => _mapServerPeers;
 
         private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByKey = new Dictionary<string, CentralServerPeerInfo>();
         /// <summary>
         /// Key is `{channelId}_{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByKey => _mapServerPeersByKey;
+        public Dictionary<string, CentralServerPeerInfo> MapServerPeersByKey => _mapServerPeersByKey;
 
         private Dictionary<string, CentralServerPeerInfo> _instanceMapServerPeersByKey = new Dictionary<string, CentralServerPeerInfo>();
         /// <summary>
         /// Key is `{channelId}_{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, CentralServerPeerInfo> InstanceMapServerPeersByKey => _instanceMapServerPeersByKey;
+        public Dictionary<string, CentralServerPeerInfo> InstanceMapServerPeersByKey => _instanceMapServerPeersByKey;
 
         private Dictionary<string, List<CentralServerPeerInfo>> _allocateMapServerPeersByRefId = new Dictionary<string, List<CentralServerPeerInfo>>();
         /// <summary>
         /// Key is `{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, List<CentralServerPeerInfo>> AllocateMapServerPeersByRefId => _allocateMapServerPeersByRefId;
+        public Dictionary<string, List<CentralServerPeerInfo>> AllocateMapServerPeersByRefId => _allocateMapServerPeersByRefId;
 
         private Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> _mapSpawnResultActions = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
         /// <summary>
         /// Key is `{channelId}_{refId}`
         /// </summary>
-        public IReadOnlyDictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> MapSpawnResultActions => _mapSpawnResultActions;
+        public Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> MapSpawnResultActions => _mapSpawnResultActions;
 #endif
 
         public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
