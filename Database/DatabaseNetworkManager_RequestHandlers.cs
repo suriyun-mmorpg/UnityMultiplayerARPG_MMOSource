@@ -179,6 +179,7 @@ namespace MultiplayerARPG.MMO
                 {
                     CharacterData = null,
                 });
+                return;
             }
             await Database.UpdateCharacter(request.Data.State, request.Data.CharacterData, request.Data.SummonBuffs, request.Data.DeleteStorageReservation);
             List<UniTask> tasks = new List<UniTask>
@@ -201,6 +202,7 @@ namespace MultiplayerARPG.MMO
             if (playerCharacter == null)
             {
                 result.InvokeError(EmptyMessage.Value);
+                return;
             }
             // Delete data from database
             await Database.DeleteCharacter(request.Data.UserId, request.Data.CharacterId);
