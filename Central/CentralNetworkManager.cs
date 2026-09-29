@@ -141,6 +141,14 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+        protected override void OnDestroy()
+        {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            GameInstance.OnGameDataLoadedEvent -= GameInstance_OnGameDataLoadedEvent;
+#endif
+            base.OnDestroy();
+        }
+
         protected override void Update()
         {
             base.Update();
