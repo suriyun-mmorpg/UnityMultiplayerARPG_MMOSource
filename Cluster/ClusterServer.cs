@@ -61,6 +61,7 @@ namespace MultiplayerARPG.MMO
             RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RunMap);
             RegisterResponseHandler<RequestFindOnlineUserMessage, ResponseFindOnlineUserMessage>(MMORequestTypes.FindOnlineUser);
             RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
+            RegisterMessageHandler(MMOMessageTypes.DataPatchReload, HandleDataPatchReload);
             RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
             RegisterMessageHandler(MMOMessageTypes.UpdateParty, HandleUpdateParty);
@@ -315,6 +316,21 @@ namespace MultiplayerARPG.MMO
                     peerInfo = peerInfo,
                 });
             return default;
+        }
+#endif
+
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
+        private void HandleDataPatchReload(MessageHandlerData handler)
+        {
+            // Game clients cannot originate reloads: require a registered map server peer.
+            var peers = _mapServerPeers.Values.Concat(_allocateMapServerPeersByRefId.Values.SelectMany(values => values)).ToArray();
+            if (!peers.Any(peer => peer.connectionId == handler.ConnectionId))
+                return;
+            DataPatchReloadMessage request = handler.ReadMessage<DataPatchReloadMessage>();
+            if (!request.IsValid)
+                return;
+            foreach (long connectionId in peers.Select(peer => peer.connectionId).Distinct())
+                SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.DataPatchReload, writer => writer.PutValue(request));
         }
 #endif
 
