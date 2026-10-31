@@ -119,6 +119,8 @@ namespace MultiplayerARPG.MMO
                 return false;
 
             int index = argsList.FindIndex(0, a => a.Equals(argName));
+            if (index + 1 >= args.Length)
+                return false;
             result = args[index + 1];
             return true;
         }
